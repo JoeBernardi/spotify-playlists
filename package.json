@@ -1,0 +1,16 @@
+{
+  "name": "spotify-playlists",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Joe Bernardi",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "esm": "^3.2.25",
+    "spotify-web-api-node": "^4.0.0"
+  },
+  "devDependencies": {
+    "prettier": "1.18.2"
+  }
+}
