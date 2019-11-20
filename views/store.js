@@ -6,12 +6,11 @@ const getJson = bent("GET", "json", `${process.env.PROTOCOL}${process.env.HOST}:
 
 export const actions = () => ({
 	getPlaylists: async (state) => {
-		console.log("beat");
-		const testo = await getJson("/playlists");
-		console.log(testo);
-		console.log("incesto");
+		const playlists = await getJson("/playlists");
+
 		return {
 			...state,
+			playlists
 		}
 	},
 });

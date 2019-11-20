@@ -22,9 +22,9 @@ render(
 	<Provider store={store}>
 		<div className="container">
 			HELLO SEYMORUR
-			<section className="section" style={{ paddingTop:0 }}>
+			<div>
 				<AppRouter />
-			</section>
+			</div>
 		</div>
 	</Provider>,
 	app,

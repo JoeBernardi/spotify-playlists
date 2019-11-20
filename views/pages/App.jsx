@@ -1,13 +1,14 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "preact/hooks";
 
+import Playlist from "../components/Playlist";
+
 const Main = ({ getPlaylists, playlists }) => {
 	const [isLoading, setIsLoading] = useState(!playlists.length);
 
 	useEffect(() => {
 		getPlaylists().then(() => {
 			setIsLoading(false);
-			console.log(playlists);
 		});
 	}, []);
 
@@ -16,8 +17,10 @@ const Main = ({ getPlaylists, playlists }) => {
 			{isLoading
 				&& <div>LOd</div>
 			}
-			{!isLoading
-				&& <div>Suces</div>
+			{(!isLoading && playlists)
+				&& <div>
+					{playlists.map((playlist) => <Playlist playlist={playlist} />)}
+				</div>
 			}
 		</div>
 	)
