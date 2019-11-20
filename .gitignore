@@ -1,2 +1,8 @@
+.DS_Store
+node_modules
 .env
-node_modules/
+yarn-error.log
+docs
+log
+.cache
+dist

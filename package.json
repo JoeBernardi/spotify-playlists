@@ -5,12 +5,68 @@
   "author": "Joe Bernardi",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "watch:server": "NODE_ENV=development nodemon --exec babel-node ./server.js",
+    "watch:client": "NODE_ENV=development parcel watch ./views/main.jsx"
+  },
   "dependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/plugin-transform-react-jsx": "^7.7.0",
+    "bent": "^7.0.2",
     "dotenv": "^8.2.0",
+    "ejs": "^2.7.4",
     "esm": "^3.2.25",
-    "spotify-web-api-node": "^4.0.0"
+    "express": "^4.17.1",
+    "node-cache": "^5.0.2",
+    "preact": "^10.0.5",
+    "preact-router": "^3.1.0",
+    "prop-types": "^15.7.2",
+    "spotify-web-api-node": "^4.0.0",
+    "unistore": "^3.5.1"
   },
   "devDependencies": {
-    "prettier": "1.18.2"
+    "@babel/core": "^7.7.2",
+    "@babel/node": "^7.7.0",
+    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/runtime": "^7.7.2",
+    "@emotion/babel-plugin-jsx-pragmatic": "^0.1.4",
+    "nodemon": "^2.0.0",
+    "parcel-bundler": "^1.12.4",
+    "prettier": "1.18.2",
+    "sass": "^1.23.7"
+  },
+  "babel": {
+    "plugins": [
+      "@babel/plugin-transform-runtime",
+      [
+        "@babel/plugin-transform-react-jsx",
+        {
+          "pragma": "h"
+        }
+      ],
+      [
+        "@emotion/babel-plugin-jsx-pragmatic",
+        {
+          "module": "preact",
+          "export": "h",
+          "import": "h"
+        }
+      ]
+    ],
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "alias": {
+    "react": "preact/compat",
+    "react-dom/test-utils": "preact/test-utils",
+    "react-dom": "preact/compat"
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {},
+      "postcss-preset-env": true
+    }
   }
 }
