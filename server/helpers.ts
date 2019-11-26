@@ -4,7 +4,7 @@ import SpotifyWebApi from "spotify-web-api-node";
 
 import { Artist, Playlist, Track } from "../shared/interfaces";
 
-import { cacheKey, cacheTTLInSeconds, playlistLimit } from "./consts";
+import { cacheKey, cacheTTLInSeconds, months, playlistLimit } from "./consts";
 
 export const getEnv = (): any => dotenv.config().parsed;
 
@@ -71,17 +71,20 @@ const normalizeTracks = (tracksFromApi: any[]): Track[] => {
 };
 
 const normalizePlaylists = (playlistsFromApi: any[]): Playlist[] => {
-	return playlistsFromApi.map((playlist: any) => {
-		return {
-			description: playlist.description,
-			image: playlist.images[0].url,
-			title: playlist.name,
-			tracks: normalizeTracks(playlist.tracks.items),
-		};
-	});
+	return playlistsFromApi
+		.filter((playlist: any) => months.indexOf(playlist.name.split(" ")[0]) > -1)
+		.map((playlist: any) => {
+			return {
+				description: playlist.description,
+				image: playlist.images[0].url,
+				title: playlist.name,
+				tracks: normalizeTracks(playlist.tracks.items),
+			};
+		})
+		.sort((a, b) => new Date(b.title) > new Date(a.title) ? 1 : -1);
 };
 
-export const authAndFetchPlaylists = async (): Promise<Playlist[]> => {
+export const authAndFetchPlaylists = async (): Promise<Playlist[] | Error> => {
 	const cachedPlaylists: Playlist[] | undefined = playlistCache.get(cacheKey);
 
 	if (cachedPlaylists) {
@@ -92,8 +95,8 @@ export const authAndFetchPlaylists = async (): Promise<Playlist[]> => {
 	const { access_token } = data.body;
 	apiInstance.setAccessToken(access_token);
 
-	return getPlaylists(apiInstance, 0)
-		.then((playlists: object[]) => {
+	return getPlaylists(apiInstance)
+		.then((playlists: any) => {
 			const normalizedPlaylists = normalizePlaylists(playlists);
 			playlistCache.set(cacheKey, normalizedPlaylists);
 			return Promise.resolve(normalizedPlaylists);

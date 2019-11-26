@@ -1,6 +1,4 @@
 ## Todo
-- Typescript
-- Prettifier
 - Sort the playlists properly
 - Force bust the cache (pw protect or something)
 - Style everything
