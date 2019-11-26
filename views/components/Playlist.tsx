@@ -1,6 +1,6 @@
 import { Playlist } from "../../shared/interfaces";
 
-interface PlaylistProp {
+interface PlaylistProps {
 	playlist: Playlist;
 }
 
