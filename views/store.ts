@@ -1,6 +1,6 @@
+import bent from "bent";
 import createStore from "unistore";
 import devtools from "unistore/devtools";
-import bent from "bent";
 
 const getJson = bent("GET", "json", `${process.env.PROTOCOL}${process.env.HOST}:${process.env.PORT}`, 200, 422, 500);
 
@@ -11,16 +11,16 @@ export const actions = () => ({
 		return {
 			...state,
 			playlists
-		}
+		};
 	},
 });
 
 export const initialState = {
 	playlists: [],
-}
+};
 
-const storeExport = (initialState: object) => (process.env.NODE_ENV === "production"
-	? createStore(initialState)
-	: devtools(createStore(initialState)));
+const storeExport = (state: object) => (process.env.NODE_ENV === "production"
+	? createStore(state)
+	: devtools(createStore(state)));
 
 export default storeExport;

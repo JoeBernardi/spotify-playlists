@@ -12,7 +12,7 @@ export interface Artist {
 
 export interface Playlist {
 	description?: string;
-	image: string;
+	image?: string;
 	title: string;
 	tracks: Track[];
 }

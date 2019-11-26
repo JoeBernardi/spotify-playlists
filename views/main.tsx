@@ -5,10 +5,10 @@
 // https://github.com/preactjs/preact/issues/1746
 
 if (process.env.NODE_ENV === "development") {
-	require("preact/debug"); // eslint-disable-line
+	require("preact/debug"); // tslint:disable-line
 }
 
-import { render } from "preact";
+import { h, render } from "preact";
 import { Provider } from "unistore/preact";
 
 import AppRouter from "./router";

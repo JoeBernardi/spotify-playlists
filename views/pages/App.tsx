@@ -1,9 +1,16 @@
-import PropTypes from "prop-types";
-import { useState, useEffect } from "preact/hooks";
+import { h } from "preact";
+import { useEffect, useState } from "preact/hooks";
 
+import { Playlist as PlaylistInterface } from "../../shared/interfaces";
 import Playlist from "../components/Playlist";
 
-const Main = ({ getPlaylists, playlists }) => {
+interface MainProps {
+	path: string; // this sucks haha
+	getPlaylists: () => Promise<void>;
+	playlists: PlaylistInterface[];
+}
+
+const Main = ({ getPlaylists, playlists }: MainProps) => {
 	const [isLoading, setIsLoading] = useState(!playlists.length);
 
 	useEffect(() => {
@@ -15,20 +22,15 @@ const Main = ({ getPlaylists, playlists }) => {
 	return (
 		<div>
 			{isLoading
-				&& <div>LOd</div>
+				&& <div>Loading</div>
 			}
 			{(!isLoading && playlists)
 				&& <div>
-					{playlists.map((playlist) => <Playlist playlist={playlist} />)}
+					{playlists.map((playlist: PlaylistInterface) => <Playlist playlist={playlist} />)}
 				</div>
 			}
 		</div>
-	)
+	);
 };
-
-Main.propTypes = {
-	getPlaylists: PropTypes.func.isRequired,
-	playlists: PropTypes.array.isRequired,
-}
 
 export default Main;

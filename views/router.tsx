@@ -1,10 +1,10 @@
-import { connect } from "unistore/preact";
 import Router from "preact-router";
+import { connect } from "unistore/preact";
 
 import App from "./pages/App";
 import { actions } from "./store";
 
-const appRouter = (props: any) => (
+const appRouter = (props) => (
 	<Router>
 		<App
 			path="/"
@@ -13,6 +13,5 @@ const appRouter = (props: any) => (
 		/>
 	</Router>
 );
-
 
 export default connect((props) => props, actions)(appRouter);
