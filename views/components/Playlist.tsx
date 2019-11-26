@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
+import { Playlist } from "../../shared/interfaces";
 
-const Playlist = ({ playlist }) => {
+const Playlist = ({ playlist }: Playlist) => {
 	return (
 		<div>
 			<h2>{playlist.title}</h2>

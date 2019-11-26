@@ -4,13 +4,15 @@ import Router from "preact-router";
 import App from "./pages/App";
 import { actions } from "./store";
 
-const appRouter = (props) => (
+const appRouter = (props: any) => (
 	<Router>
-		<App path="/"
+		<App
+			path="/"
 			getPlaylists={props.getPlaylists}
 			playlists={props.playlists}
 		/>
 	</Router>
 );
+
 
 export default connect((props) => props, actions)(appRouter);

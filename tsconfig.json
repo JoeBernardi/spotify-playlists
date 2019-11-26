@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "moduleResolution": "node",
+    "target": "es6",
+    "jsx": "react",
+    "jsxFactory": "h",
+    "lib": [
+      "es6",
+      "es7",
+      "dom"
+    ],
+    "noEmit": true,
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+  },
+  "exclude": [
+    ".git",
+    "/node_modules"
+  ]
+}

@@ -2,11 +2,12 @@ import dotenv from "dotenv";
 import NodeCache from "node-cache";
 import SpotifyWebApi from "spotify-web-api-node";
 
-import { playlistLimit, cacheTTLInSeconds, cacheKey } from "./consts";
+import { Artist, Playlist, Track } from "./shared/interfaces";
 
-export const getEnv = () => dotenv.config().parsed;
+import { cacheKey, cacheTTLInSeconds, playlistLimit } from "./consts";
 
-const { SPOTIFY_USER } = getEnv();
+export const getEnv = (): any => dotenv.config().parsed;
+
 const playlistCache = new NodeCache({ stdTTL: cacheTTLInSeconds });
 
 const apiInstance = new SpotifyWebApi({
@@ -15,73 +16,70 @@ const apiInstance = new SpotifyWebApi({
 	redirectUri: getEnv().REDIRECT_URI
 });
 
-const getPlaylists = async (apiInstance) => {
-	let playlists = [];
+const getPlaylists = async (spotifyAPI: object): Promise<any> => {
+	let playlists: object[] = [];
 
-	const getPlaylistsFromServer = async (offset = 0) => {
-		const data = await apiInstance.getUserPlaylists(getEnv().SPOTIFY_USER, {
+	const getPlaylistsFromServer = async (offset = 0): Promise<object[]> => {
+		const data = await spotifyAPI.getUserPlaylists(getEnv().SPOTIFY_USER, {
 			limit: playlistLimit,
 			offset
-		})
+		});
 
 		const { items, next } = data.body;
 
 		if (items) {
 			const fullPlaylists = await Promise.all(
-				items.map(playlist => apiInstance.getPlaylist(playlist.id))
-			)
+				items.map((playlist: any) => spotifyAPI.getPlaylist(playlist.id))
+			);
 
-			playlists = playlists.concat(fullPlaylists.map((response) => response.body));
+			playlists = playlists.concat(fullPlaylists.map((response: any) => response.body));
 		}
 
 		if (next) {
 			return getPlaylistsFromServer(offset + playlistLimit);
 		}
 
-		return true;
+		return playlists;
 	};
 
-	await getPlaylistsFromServer()
-		.catch((e) => Promise.reject(e));
-
-	return playlists;
+	return await getPlaylistsFromServer()
+		.catch((e: Error) => Promise.reject(e));
 };
 
-const normalizeTracks = (tracksFromApi) => {
-	return tracksFromApi.map((track) => {
+const normalizeTracks = (tracksFromApi: any[]): Track[] => {
+	return tracksFromApi.map((track: any) => {
 		const {
 			name,
 			duration_ms,
 			preview_url,
 		} = track.track;
 
-		const artists = track.track.artists.map((artist) => {
+		const artists = track.track.artists.map((artist: any): Artist => {
 			return {
-				url: artist.external_urls.spotify,
-				name: artist.name
-			}
+				name: artist.name as string,
+				url:  artist.external_urls.spotify as string,
+			};
 		});
 
 		return {
 			artist: artists,
-			title: name,
 			duration_ms,
 			preview_url,
+			title: name,
+		};
+	});
+};
 
-		}
-	})
-}
-
-const normalizePlaylists = (playlistsFromApi) => {
-	return playlistsFromApi.map((playlist) => {
+const normalizePlaylists = (playlistsFromApi: any[]): Playlist[] => {
+	return playlistsFromApi.map((playlist: any) => {
 		return {
 			description: playlist.description,
-			title: playlist.name,
 			image: playlist.images[0].url,
+			title: playlist.name,
 			tracks: normalizeTracks(playlist.tracks.items),
-		}
-	})
-}
+		};
+	});
+};
 
 export const authAndFetchPlaylists = async () => {
 	const cachedPlaylists = playlistCache.get(cacheKey);
@@ -95,13 +93,13 @@ export const authAndFetchPlaylists = async () => {
 	apiInstance.setAccessToken(access_token);
 
 	return getPlaylists(apiInstance, 0)
-		.then((playlists) => {
+		.then((playlists: object[]) => {
 			const normalizedPlaylists = normalizePlaylists(playlists);
 			playlistCache.set(cacheKey, normalizedPlaylists);
 			return Promise.resolve(normalizedPlaylists);
 		})
 		.catch((e) => e);
-}
+};
 
 export default {
 	authAndFetchPlaylists,

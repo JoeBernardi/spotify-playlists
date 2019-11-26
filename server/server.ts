@@ -1,20 +1,18 @@
-import path from "path";
-import dotenv from "dotenv";
 import express from "express";
+import path from "path";
 
 import { authAndFetchPlaylists, getEnv } from "./helpers";
 
 const app = express();
 app.set("view engine", "ejs");
-app.set("views", [path.join(__dirname, "views")]);
-app.use(express.static(path.join(__dirname, "/", "dist")));
+app.use(express.static(path.join(__dirname, "/")));
 
-app.get("/", async (req, res) => {
+app.get("/", async (_req, res) => {
 	const state = {};
 	return res.render("templates/index", { state });
 });
 
-app.get("/playlists", async (req, res) => {
+app.get("/playlists", async (_req, res) => {
 	try {
 		const playlists = await authAndFetchPlaylists();
 		return res.send(playlists);
@@ -23,7 +21,11 @@ app.get("/playlists", async (req, res) => {
 	}
 });
 
-
 app.listen(getEnv().PORT, () => {
 	console.log(`Listening on port ${getEnv().PORT}!`);
+});
+
+process.on("SIGINT", () => {
+    console.log("Terminating...");
+    process.exit(0);
 });

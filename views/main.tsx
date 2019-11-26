@@ -10,7 +10,6 @@ if (process.env.NODE_ENV === "development") {
 
 import { render } from "preact";
 import { Provider } from "unistore/preact";
-import { Link, route } from "preact-router";
 
 import AppRouter from "./router";
 import createStore, { initialState } from "./store";

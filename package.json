@@ -1,12 +1,16 @@
 {
   "name": "spotify-playlists",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/server",
   "author": "Joe Bernardi",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "watch:server": "NODE_ENV=development nodemon --exec babel-node ./server.js",
+    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
+    "build": "NODE_ENV=production parcel build ./server/server.ts --target node",
+    "prestart": "yarn build",
+    "start": "node ./dist/server.js",
+    "watch:server": "NODE_ENV=development nodemon --exec node ./server/server.ts",
     "watch:client": "NODE_ENV=development parcel watch ./views/main.jsx"
   },
   "dependencies": {
@@ -19,10 +23,15 @@
     "express": "^4.17.1",
     "node-cache": "^5.0.2",
     "preact": "^10.0.5",
+    "preact-async-route": "^2.2.1",
     "preact-router": "^3.1.0",
     "prop-types": "^15.7.2",
     "spotify-web-api-node": "^4.0.0",
+    "typescript": "^3.7.2",
     "unistore": "^3.5.1"
+  },
+  "engines": {
+    "node": ">=10"
   },
   "devDependencies": {
     "@babel/core": "^7.7.2",
@@ -31,10 +40,13 @@
     "@babel/preset-env": "^7.7.1",
     "@babel/runtime": "^7.7.2",
     "@emotion/babel-plugin-jsx-pragmatic": "^0.1.4",
+    "@types/express": "^4.17.2",
+    "@types/node": "^12.12.11",
     "nodemon": "^2.0.0",
     "parcel-bundler": "^1.12.4",
     "prettier": "1.18.2",
-    "sass": "^1.23.7"
+    "sass": "^1.23.7",
+    "tslint": "^5.20.1"
   },
   "babel": {
     "plugins": [
