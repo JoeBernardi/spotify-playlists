@@ -8,13 +8,13 @@ if (process.env.NODE_ENV === "development") {
 	require("preact/debug"); // tslint:disable-line
 }
 
-import { h, render } from "preact";
+import { render } from "preact";
 import { Provider } from "unistore/preact";
 
 import AppRouter from "./router";
 import createStore, { initialState } from "./store";
 
-const app = document.getElementById("app");
+const app = document.getElementById("app") as Element;
 const store = createStore(initialState);
 
 render(

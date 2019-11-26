@@ -2,13 +2,9 @@ module.exports = {
   env: {
     "es6": true,
     "node": true,
-    "browser": true,
-    "jest/globals": true,
+    "browser": true
   },
-  plugins: [
-    "jest",
-    "react"
-  ],
+  plugins: [  ],
   extends: [
     "airbnb-base",
   ],
@@ -16,16 +12,6 @@ module.exports = {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly",
     "window": true,
-  },
-  settings: {
-    "import/resolver": {
-      "node": {
-        "extensions": [
-          ".js",
-          ".jsx",
-        ],
-      },
-    },
   },
   parserOptions: {
     "ecmaVersion": 2018,

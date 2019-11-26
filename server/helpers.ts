@@ -29,10 +29,10 @@ const getPlaylists = async (spotifyAPI: SpotifyWebApi): Promise<object[] | Error
 
 		if (items) {
 			const fullPlaylists = await Promise.all(
-				items.map((playlist: any) => spotifyAPI.getPlaylist(playlist.id))
+				items.map((playlist) => spotifyAPI.getPlaylist(playlist.id))
 			);
 
-			playlists = playlists.concat(fullPlaylists.map((response: any) => response.body));
+			playlists = playlists.concat(fullPlaylists.map((response) => response.body));
 		}
 
 		if (next) {

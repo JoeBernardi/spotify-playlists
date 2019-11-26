@@ -3,6 +3,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es6",
+    "jsx": "preserve",
     "lib": [
       "es6",
       "es7",
@@ -10,7 +11,10 @@
     ],
     "noEmit": true,
     "sourceMap": true,
+    "noImplicitAny": true,
     "noUnusedLocals": true,
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
   }

@@ -4,7 +4,7 @@ import { connect } from "unistore/preact";
 import App from "./pages/App";
 import { actions } from "./store";
 
-const appRouter = (props) => (
+const appRouter = (props: any) => (
 	<Router>
 		<App
 			path="/"
