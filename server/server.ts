@@ -7,11 +7,6 @@ const app = express();
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "/")));
 
-app.get("/", async (_req, res) => {
-	const state = {};
-	return res.render("templates/index", { state });
-});
-
 app.get("/playlists", async (_req, res) => {
 	try {
 		const playlists = await authAndFetchPlaylists();
@@ -19,6 +14,11 @@ app.get("/playlists", async (_req, res) => {
 	} catch (e) {
 		throw Error(e);
 	}
+});
+
+app.get("*", async (_req, res) => {
+	const state = {};
+	return res.render("templates/index", { state });
 });
 
 app.listen(getEnv().PORT, () => {

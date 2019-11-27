@@ -1,10 +1,20 @@
-import { Playlist } from "../../shared/interfaces";
+import { Playlist as PlaylistInterface } from "../../shared/interfaces";
 
-interface PlaylistProps {
-	playlist: Playlist;
+interface PlaylistObject {
+	[key: string]: PlaylistInterface;
 }
 
-const Playlist = ({ playlist }: PlaylistProps) => {
+interface PlaylistProps {
+	path: string;
+	playlistsById: PlaylistObject;
+	activePlaylistId?: string;
+}
+
+const Playlist = ({ playlistsById, activePlaylistId }: PlaylistProps) => {
+	if (!activePlaylistId || !playlistsById[activePlaylistId]) { return <div>Ya goofd</div>; }
+
+	const playlist = playlistsById[activePlaylistId];
+
 	return (
 		<div>
 			<h2>{playlist.title}</h2>

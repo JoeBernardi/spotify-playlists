@@ -2,21 +2,32 @@ import bent from "bent";
 import createStore from "unistore";
 import devtools from "unistore/devtools";
 
+import { Playlist } from "../shared/interfaces";
+
 const getJson = bent("GET", "json", `${process.env.PROTOCOL}${process.env.HOST}:${process.env.PORT}`, 200, 422, 500);
 
 export const actions = () => ({
 	getPlaylists: async (state: object): Promise<object> => {
-		const playlists = await getJson("/playlists");
+		const allPlaylists = await getJson("/playlists");
+
+		const playlistsById = allPlaylists.reduce((byId: any, playlist: Playlist) => {
+			byId[playlist.id] = playlist;
+			return byId;
+		}, {});
+
+		const sortedPlaylistIds = allPlaylists.map((playlist: Playlist) => playlist.id);
 
 		return {
 			...state,
-			playlists
+			playlistsById,
+			sortedPlaylistIds
 		};
 	},
 });
 
 export const initialState = {
-	playlists: [],
+	sortedPlaylistIds: [],
+	playlistsById: {},
 };
 
 const storeExport = (state: object) => (process.env.NODE_ENV === "production"

@@ -76,8 +76,11 @@ const normalizePlaylists = (playlistsFromApi: any[]): Playlist[] => {
 		.map((playlist: any) => {
 			return {
 				description: playlist.description,
+				id: playlist.id,
 				image: playlist.images[0].url,
 				title: playlist.name,
+				month: playlist.name.split(" ")[0],
+				year: playlist.name.split(" ")[1],
 				tracks: normalizeTracks(playlist.tracks.items),
 			};
 		})

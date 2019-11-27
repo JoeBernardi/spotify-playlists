@@ -11,7 +11,8 @@ if (process.env.NODE_ENV === "development") {
 import { render } from "preact";
 import { Provider } from "unistore/preact";
 
-import AppRouter from "./router";
+import App from "./App";
+
 import createStore, { initialState } from "./store";
 
 const app = document.getElementById("app") as Element;
@@ -19,12 +20,7 @@ const store = createStore(initialState);
 
 render(
 	<Provider store={store}>
-		<div className="container">
-			HELLO SEYMORUR
-			<div>
-				<AppRouter />
-			</div>
-		</div>
+		<App />
 	</Provider>,
 	app,
 );
