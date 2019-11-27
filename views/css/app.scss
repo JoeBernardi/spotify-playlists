@@ -1,0 +1,98 @@
+body, html {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+}
+
+.wrapper {
+	display: flex;
+
+	.sidebar {
+		padding: 15px 2%;
+		background: $dark;
+		width: 16%;
+		min-height: 100vh;
+
+		header {
+			margin-bottom: 15px;
+
+			.hero {
+				text-decoration: none;
+				font-size: 42px;
+				letter-spacing: 0.025em;
+				text-shadow: 2px 2px $accent;
+				margin-top: 0;
+				color: $light;	
+				font-family: $sans;
+				font-weight: 900;
+				display: block;
+			}
+		}
+
+		nav {
+			.nav-playlists-year {
+				h3 {
+					color: $accent;
+					font-family: $sans;
+					font-size: 24px;
+					margin: 0 0 12px;
+				}
+
+				&-playlists {
+					.nav-item {
+						font-family: $serif;
+						text-decoration: none;
+						color: $light;
+						font-size: 16px;
+						line-height: 20px;
+						display: block;
+
+						&.active {
+							color: $accent;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.content {
+		flex: 1;
+		padding: 15px 45px;
+		background: $light;
+
+		.playlist {
+			h2 {
+				text-decoration: none;
+				font-size: 36px;
+				margin-top: 0;
+				color: $dark;	
+				font-family: $sans;
+				font-weight: 900;			
+			}
+
+			&-info {
+				display: flex;
+
+				&-image {
+					img {	
+						width: 200px;
+						height: 200px;
+						object-fit: cover;
+					}
+				}
+
+				&-text {
+					margin-left: 12px;
+
+					p {
+						color: $dark;
+						font-family: $sans;
+						width: 60%;
+					}
+				}
+			}
+		}
+	}
+}
+

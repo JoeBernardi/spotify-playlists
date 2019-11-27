@@ -10,6 +10,8 @@ import Playlist from "./components/Playlist";
 
 import { actions } from "./store";
 
+import "./css/main.scss";
+
 interface PlaylistObject {
 	[key: string]: PlaylistInterface;
 }
@@ -23,32 +25,25 @@ interface AppProps {
 }
 
 const appRouter = (props: AppProps) => {
-	const [isLoading, setIsLoading] = useState(!props.sortedPlaylistIds.length);
-
 	useEffect(() => {
-		props.getPlaylists().then(() => {
-			setIsLoading(false);
-		});
+		props.getPlaylists();
 	}, []);
 
 	return (
-		<div id="wrapper">
-			<h2>Likes Song</h2>
-			{!isLoading
-				&& <Fragment>
-					<Nav
-						sortedPlaylistIds={props.sortedPlaylistIds}
+		<section className="wrapper">
+			<Nav
+				sortedPlaylistIds={props.sortedPlaylistIds}
+				playlistsById={props.playlistsById}
+			/>
+			<section className="content">
+				<Router>
+					<Playlist
+						path="/id/:activePlaylistId?"
 						playlistsById={props.playlistsById}
 					/>
-					<Router>
-						<Playlist
-							path="/id/:activePlaylistId?"
-							playlistsById={props.playlistsById}
-						/>
-					</Router>
-				</Fragment>
-			}
-		</div>
+				</Router>
+			</section>
+		</section>
 	);
 };
 

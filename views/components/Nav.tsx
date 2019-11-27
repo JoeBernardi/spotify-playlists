@@ -1,5 +1,8 @@
+import { Fragment } from "preact";
 import { Link } from "preact-router/match";
 import { Playlist } from "../../shared/interfaces";
+
+import NavItem from "./NavItem";
 
 interface PlaylistObject {
 	[key: string]: Playlist;
@@ -11,34 +14,51 @@ interface NavProps {
 }
 
 const Nav = ({ sortedPlaylistIds, playlistsById }: NavProps) => {
-	const allPlaylists = sortedPlaylistIds.map((playlistId: string) => playlistsById[playlistId]);
-	const playlistsByYear = allPlaylists.reduce((acc: any, playlist: any): any => {
+	const allPlaylists: Playlist[] = sortedPlaylistIds.map((playlistId: string) => playlistsById[playlistId]);
+
+	const playlistsByYear = allPlaylists.reduce((acc: any, playlist: Playlist) => {
 		if (!acc[playlist.year]) { acc[playlist.year] = []; }
 		acc[playlist.year].push(playlist);
 		return acc;
 	}, {});
 
-	const navByYear = Object.keys(playlistsByYear).reverse().map((year) => {
-		const yearOfPlaylists = playlistsByYear[year];
+	const years: string[] = Object.keys(playlistsByYear).reverse();
+
+	const navByYear = years.map((year: string) => {
+		const yearOfPlaylists: Playlist[] = playlistsByYear[year];
 		const yearLists = yearOfPlaylists
-			.map((playlist: Playlist) => <li><Link activeClassName="active" href={`/id/${playlist.id}`}>{playlist.month}</Link></li>);
+			.map((playlist: Playlist) => (
+				<NavItem
+					href={`/id/${playlist.id}`}
+					text={playlist.month}
+				/>
+			));
 
 		return (
-			<div>
-				<div>
+			<div className="nav-playlists-year">
+				<h3>
 					{year}
-				</div>
-				<ul>
+				</h3>
+				<div className="nav-playlists-year-playlists">
 					{yearLists}
-				</ul>
+				</div>
 			</div>
 		);
 	});
 
 	return (
-		<nav>
-			{navByYear}
-		</nav>
+		<section className="sidebar">
+			<header>
+				<Link href="/" activeClassName="active" className="hero">Likes Song</Link>
+			</header>
+			<nav>
+				{sortedPlaylistIds.length
+					&& <section className="nav-playlists">
+						{navByYear}
+					</section>
+				}
+			</nav>
+		</section>
 	);
 };
 
