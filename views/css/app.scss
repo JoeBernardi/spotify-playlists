@@ -19,13 +19,13 @@ body, html {
 
 			.hero {
 				text-decoration: none;
-				font-size: 42px;
+				font-size: 38px;
 				letter-spacing: 0.025em;
 				text-shadow: 2px 2px $accent;
 				margin-top: 0;
 				color: $light;	
 				font-family: $sans;
-				font-weight: 900;
+				font-weight: 800;
 				display: block;
 			}
 		}
@@ -34,19 +34,34 @@ body, html {
 			.nav-playlists-year {
 				margin-bottom: 16px;
 
-				h3 {
+				&-header {
 					color: $accent;
 					font-family: $sans;
 					font-size: 24px;
 					margin: 0 0 8px;
 					border-bottom: 1px solid $accent;
+					cursor: pointer;
+					display: flex;
+					justify-content: space-between;
+
+					&-title {
+						margin: 0;
+					}
+
+					&-icon {
+						transform: scale(0.7);
+						align-self: center;
+					}
 				}
 
 				&-playlists {
+					transition: max-height 0.2s ease-out;
+					max-height: 0;
+					overflow: hidden;
+
 					.nav-item {
 						font-family: $mono;
 						text-decoration: none;
-						font-weight: 400;
 						color: $light;
 						letter-spacing: 0.025em;
 						font-size: 14px;
@@ -63,6 +78,12 @@ body, html {
 						}
 					}
 				}
+
+				&.active {
+					.nav-playlists-year-playlists {
+						max-height: 280px;
+					}
+				}
 			}
 		}
 	}
@@ -75,8 +96,11 @@ body, html {
 		.playlist {
 			&-info {
 				display: flex;
+				margin-bottom: 24px;
 
 				&-image {
+					height: 200px;
+
 					img {	
 						width: 200px;
 						height: 200px;
@@ -86,53 +110,113 @@ body, html {
 
 				&-text {
 					margin-left: 12px;
+					display: flex;
+					flex-direction: column;
 
-					&-title {
-						letter-spacing: 0.025em;
-						text-decoration: none;
-						font-size: 36px;
-						margin-top: 0;
-						color: $light;	
-						font-family: $sans;
-						font-weight: 900;
+					&-header {
+						display: flex;
 
-						&:hover {
-							text-decoration: underline;
+						&-title {
+							text-decoration: none;
+							font-size: 36px;
+							margin: 0;
+							color: $light;	
+							font-family: $sans;
+							font-weight: 700;
+						}
+
+						&-link-icon {
+							display: block;
+							margin-left: 16px;
+							align-self: center;
+							color: $light;
+							transform: scale(0.7);
+
+							&:hover {
+								color: $accent;
+							}
 						}
 					}
 
 					&-description {
-						font-size: 16px;
+						margin: auto 0 0;
+						font-size: 13px;
 						line-height: 22px;
-						border-top: 1px solid;
-						border-bottom: 1px solid;
-						padding: 22px 0;
+						border-top: 1px solid $gray;
+						border-bottom: 1px solid $gray;
+						padding: 18px 0;
 						color: $light;
 						font-family: $sans;
+						font-weight: 300;
 						width: 80%;
 					}
 				}
 			}
 
-			.playlist-tracks {
+			&-tracks {
+				border-collapse: collapse;
+				width: 100%;
+				margin-bottom: 32px;
 
-				&-track {
+				&-info {
 					font-family: $sans;
 					text-decoration: none;
 					color: $light;
 					letter-spacing: 0.025em;
-					font-size: 16px;
-					line-height: 20px;
+					font-size: 12px;
 					margin-bottom: 6px;
+					text-align: left;
+					text-transform: uppercase;
+					font-size: 12px;
+					letter-spacing: .125em;
+					border-bottom: 1px solid $gray;
 
+					&-type {
+						padding: 0 10px 0 0;
+						font-weight: 600;
+
+						&.icon {
+							transform: scale(0.55);
+						}
+
+						&:first-of-type {
+							padding: 0 10px;
+						}
+					}
+				}
+
+				&-track {
+					font-family: $mono;
+					color: $light;
+					font-size: 12px;
+					border-bottom: 1px solid $gray;
+
+					&:hover {
+						background: $accent;
+					}
+
+					&:last-of-type {
+						border: 0;
+					}
+
+					&-info {
+						padding: 7px 13px 7px 0;
+
+						&:last-of-type {
+							padding: 7px 0;
+						}
+
+						&:first-of-type {
+							padding: 7px 13px;
+						}
+					}
 
 					a {
 						color: $light;
 						text-decoration: none;
-						font-family: $sans;
 
 						&:hover {
-							color: $gray;
+							color: $dark;
 						}
 					}
 				}

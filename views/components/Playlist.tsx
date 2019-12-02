@@ -1,4 +1,6 @@
 import { Playlist as PlaylistInterface } from "../../shared/interfaces";
+import ClockIcon from "../img/icons/clock.svg";
+import LinkIcon from "../img/icons/link.svg";
 
 interface PlaylistObject {
 	[key: string]: PlaylistInterface;
@@ -25,18 +27,25 @@ const Playlist = ({ playlistsById, activePlaylistId }: PlaylistProps) => {
 					</div>
 				}
 				<div className="playlist-info-text">
-					<a className="playlist-info-text-title" href={playlist.url}>{playlist.title}</a>
+					<div className="playlist-info-text-header">
+						<h2 className="playlist-info-text-header-title">{playlist.title}</h2>
+						<a href={playlist.url} target="_blank" className="playlist-info-text-header-link-icon">
+							<LinkIcon />
+						</a>
+					</div>
 					{playlist.description
 						&& <p className="playlist-info-text-description" dangerouslySetInnerHTML={{__html: playlist.description}} />
 					}
 				</div>
 			</div>
 			<table className="playlist-tracks">
-				<thead>
-					<th scope="col">Title</th>
-					<th scope="col">Artist</th>
-					<th scope="col">Album</th>
-					<th scope="col">Length</th>
+				<thead className="playlist-tracks-info">
+					<tr>
+						<th className="playlist-tracks-info-type" scope="col">Title</th>
+						<th className="playlist-tracks-info-type" scope="col">Artist</th>
+						<th className="playlist-tracks-info-type" scope="col">Album</th>
+						<th className="playlist-tracks-info-type icon" scope="col"><ClockIcon /></th>
+					</tr>
 				</thead>
 				<tbody>
 				{playlist.tracks.map((track) => {
@@ -45,10 +54,10 @@ const Playlist = ({ playlistsById, activePlaylistId }: PlaylistProps) => {
 
 					return (
 						<tr className="playlist-tracks-track">
-							<td><a target="_blank" href={track.url}>{track.title}</a></td>
-							<td dangerouslySetInnerHTML={{__html: artists}} />
-							<td><a target="_blank" href={track.album.url}>{track.album.name}</a></td>
-							<td>{readableLength}</td>
+							<td className="playlist-tracks-track-info"><a target="_blank" href={track.url}>{track.title}</a></td>
+							<td className="playlist-tracks-track-info" dangerouslySetInnerHTML={{__html: artists}} />
+							<td className="playlist-tracks-track-info"><a target="_blank" href={track.album.url}>{track.album.name}</a></td>
+							<td className="playlist-tracks-track-info">{readableLength}</td>
 						</tr>
 					);
 				})}

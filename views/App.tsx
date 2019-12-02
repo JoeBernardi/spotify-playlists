@@ -40,6 +40,11 @@ const appRouter = (props: AppProps) => {
 						path="/id/:activePlaylistId?"
 						playlistsById={props.playlistsById}
 					/>
+					<Playlist
+						path="/"
+						playlistsById={props.playlistsById}
+						activePlaylistId={props.sortedPlaylistIds[0]}
+					/>
 				</Router>
 			</section>
 		</section>

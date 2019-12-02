@@ -9,6 +9,7 @@
         "indent": [ false ],
         "variable-name": [ false ],
         "object-literal-sort-keys": [ false ],
+        "no-namespace": [ false ],
         "no-console": [ false ],
         "interface-name" : [true, "never-prefix"]
     },

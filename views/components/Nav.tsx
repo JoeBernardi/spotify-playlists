@@ -1,5 +1,9 @@
 import { Link } from "preact-router/match";
+import { useState } from "preact/hooks";
 import { Playlist } from "../../shared/interfaces";
+
+import MinusIcon from "../img/icons/minus.svg";
+import PlusIcon from "../img/icons/plus.svg";
 
 import NavItem from "./NavItem";
 
@@ -13,6 +17,16 @@ interface NavProps {
 }
 
 const Nav = ({ sortedPlaylistIds, playlistsById }: NavProps) => {
+	const [activeYear, setActiveYear] = useState(null);
+
+	const toggleYear = (year) => {
+		if (year === activeYear) {
+			return setActiveYear(null);
+		}
+
+		return setActiveYear(year);
+	};
+
 	const allPlaylists: Playlist[] = sortedPlaylistIds.map((playlistId: string) => playlistsById[playlistId]);
 
 	const playlistsByYear = allPlaylists.reduce((acc: any, playlist: Playlist) => {
@@ -33,11 +47,24 @@ const Nav = ({ sortedPlaylistIds, playlistsById }: NavProps) => {
 				/>
 			));
 
+		let yearClasses = "nav-playlists-year";
+		let iconComponent = <PlusIcon />;
+
+		if (year === activeYear) {
+			yearClasses += " active";
+			iconComponent = <MinusIcon />;
+		}
+
 		return (
-			<div className="nav-playlists-year">
-				<h3>
-					{year}
-				</h3>
+			<div className={yearClasses}>
+				<div className="nav-playlists-year-header" onClick={() => toggleYear(year)}>
+					<h3 className="nav-playlists-year-header-title">
+						{year}
+					</h3>
+					<div className="nav-playlists-year-header-icon">
+						{iconComponent}
+					</div>
+				</div>
 				<div className="nav-playlists-year-playlists">
 					{yearLists}
 				</div>
@@ -51,7 +78,7 @@ const Nav = ({ sortedPlaylistIds, playlistsById }: NavProps) => {
 				<Link href="/" activeClassName="active" className="hero">Likes Song</Link>
 			</header>
 			<nav>
-				{sortedPlaylistIds.length
+				{!!sortedPlaylistIds.length
 					&& <section className="nav-playlists">
 						{navByYear}
 					</section>
