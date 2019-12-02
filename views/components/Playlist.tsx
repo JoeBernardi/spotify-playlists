@@ -25,18 +25,35 @@ const Playlist = ({ playlistsById, activePlaylistId }: PlaylistProps) => {
 					</div>
 				}
 				<div className="playlist-info-text">
-					<h2>{playlist.title}</h2>
+					<a className="playlist-info-text-title" href={playlist.url}>{playlist.title}</a>
 					{playlist.description
-						&& <p dangerouslySetInnerHTML={{__html: playlist.description}} />
+						&& <p className="playlist-info-text-description" dangerouslySetInnerHTML={{__html: playlist.description}} />
 					}
 				</div>
 			</div>
-			<ul>
+			<table className="playlist-tracks">
+				<thead>
+					<th scope="col">Title</th>
+					<th scope="col">Artist</th>
+					<th scope="col">Album</th>
+					<th scope="col">Length</th>
+				</thead>
+				<tbody>
 				{playlist.tracks.map((track) => {
 					const artists = track.artist.map((artist) => `<a target="_blank" href="${artist.url}">${artist.name}</a>`).join(", ");
-					return <li><span dangerouslySetInnerHTML={{__html: artists}} /> - {track.title}</li>;
+					const readableLength = `${track.length.minutes}:${track.length.seconds}`;
+
+					return (
+						<tr className="playlist-tracks-track">
+							<td><a target="_blank" href={track.url}>{track.title}</a></td>
+							<td dangerouslySetInnerHTML={{__html: artists}} />
+							<td><a target="_blank" href={track.album.url}>{track.album.name}</a></td>
+							<td>{readableLength}</td>
+						</tr>
+					);
 				})}
-			</ul>
+				</tbody>
+			</table>
 		</section>
 	);
 };

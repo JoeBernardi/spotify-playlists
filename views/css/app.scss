@@ -12,6 +12,7 @@ body, html {
 		background: $dark;
 		width: 16%;
 		min-height: 100vh;
+		border-right: 1px solid $accent;
 
 		header {
 			margin-bottom: 15px;
@@ -31,24 +32,34 @@ body, html {
 
 		nav {
 			.nav-playlists-year {
+				margin-bottom: 16px;
+
 				h3 {
 					color: $accent;
 					font-family: $sans;
 					font-size: 24px;
-					margin: 0 0 12px;
+					margin: 0 0 8px;
+					border-bottom: 1px solid $accent;
 				}
 
 				&-playlists {
 					.nav-item {
-						font-family: $serif;
+						font-family: $mono;
 						text-decoration: none;
+						font-weight: 400;
 						color: $light;
-						font-size: 16px;
+						letter-spacing: 0.025em;
+						font-size: 14px;
 						line-height: 20px;
 						display: block;
+						margin-bottom: 6px;
 
 						&.active {
 							color: $accent;
+						}
+
+						&:hover {
+							color: $gray;
 						}
 					}
 				}
@@ -59,18 +70,9 @@ body, html {
 	.content {
 		flex: 1;
 		padding: 15px 45px;
-		background: $light;
+		background: $dark-alternate;
 
 		.playlist {
-			h2 {
-				text-decoration: none;
-				font-size: 36px;
-				margin-top: 0;
-				color: $dark;	
-				font-family: $sans;
-				font-weight: 900;			
-			}
-
 			&-info {
 				display: flex;
 
@@ -85,10 +87,53 @@ body, html {
 				&-text {
 					margin-left: 12px;
 
-					p {
-						color: $dark;
+					&-title {
+						letter-spacing: 0.025em;
+						text-decoration: none;
+						font-size: 36px;
+						margin-top: 0;
+						color: $light;	
 						font-family: $sans;
-						width: 60%;
+						font-weight: 900;
+
+						&:hover {
+							text-decoration: underline;
+						}
+					}
+
+					&-description {
+						font-size: 16px;
+						line-height: 22px;
+						border-top: 1px solid;
+						border-bottom: 1px solid;
+						padding: 22px 0;
+						color: $light;
+						font-family: $sans;
+						width: 80%;
+					}
+				}
+			}
+
+			.playlist-tracks {
+
+				&-track {
+					font-family: $sans;
+					text-decoration: none;
+					color: $light;
+					letter-spacing: 0.025em;
+					font-size: 16px;
+					line-height: 20px;
+					margin-bottom: 6px;
+
+
+					a {
+						color: $light;
+						text-decoration: none;
+						font-family: $sans;
+
+						&:hover {
+							color: $gray;
+						}
 					}
 				}
 			}

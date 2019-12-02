@@ -8,12 +8,10 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "/")));
 
 app.get("/playlists", async (_req, res) => {
-	try {
-		const playlists = await authAndFetchPlaylists();
+		const playlists = await authAndFetchPlaylists()
+			.catch((e: Error) => Promise.reject(e));
+
 		return res.send(playlists);
-	} catch (e) {
-		throw Error(e);
-	}
 });
 
 app.get("*", async (_req, res) => {

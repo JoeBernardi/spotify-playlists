@@ -61,9 +61,25 @@ const normalizeTracks = (tracksFromApi: any[]): Track[] => {
 			};
 		});
 
+		const album = {
+			name: track.track.album.name,
+			url: track.track.album.external_urls.spotify,
+		};
+
+		const nearestDurationSecond = 1000 * Math.round(duration_ms / 1000);
+		const durationDate = new Date(nearestDurationSecond);
+		const durationMinutes = durationDate.getUTCMinutes();
+		const durationSeconds = durationDate.getUTCSeconds();
+
 		return {
+			url: track.track.external_urls.spotify as string,
 			artist: artists,
-			duration_ms,
+			length: {
+				total_ms: duration_ms,
+				minutes: durationMinutes.toString(),
+				seconds: (durationSeconds < 10 ? "0" : "") + durationSeconds;
+			},
+			album,
 			preview_url,
 			title: name,
 		};
@@ -76,6 +92,7 @@ const normalizePlaylists = (playlistsFromApi: any[]): Playlist[] => {
 		.map((playlist: any) => {
 			return {
 				description: playlist.description,
+				url: playlist.external_urls.spotify,
 				id: playlist.id,
 				image: playlist.images[0].url,
 				title: playlist.name,

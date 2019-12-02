@@ -8,7 +8,8 @@ const getJson = bent("GET", "json", `${process.env.PROTOCOL}${process.env.HOST}:
 
 export const actions = () => ({
 	getPlaylists: async (state: object): Promise<object> => {
-		const allPlaylists = await getJson("/playlists");
+		const allPlaylists = await getJson("/playlists")
+			.catch((e: Error) => Promise.reject(e));
 
 		const playlistsById = allPlaylists.reduce((byId: any, playlist: Playlist) => {
 			byId[playlist.id] = playlist;

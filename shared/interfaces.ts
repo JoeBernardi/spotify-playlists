@@ -1,11 +1,22 @@
 export interface Track {
 	artist: Artist[];
-	duration_ms: number;
+	album: Album;
+	length: {
+		total_ms: number;
+		minutes: string;
+		seconds: string;
+	};
 	preview_url: string;
 	title: string;
+	url: string;
 }
 
 export interface Artist {
+	name: string;
+	url: string;
+}
+
+export interface Album {
 	name: string;
 	url: string;
 }
@@ -15,6 +26,7 @@ export interface Playlist {
 	image?: string;
 	title: string;
 	id: string;
+	url: string;
 	year: string;
 	month: string;
 	tracks: Track[];

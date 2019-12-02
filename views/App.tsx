@@ -1,6 +1,5 @@
-import { Fragment } from "preact";
 import Router from "preact-router";
-import { useEffect, useState } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import { connect } from "unistore/preact";
 
 import { Playlist as PlaylistInterface } from "../shared/interfaces";
