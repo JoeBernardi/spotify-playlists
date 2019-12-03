@@ -1,7 +1,8 @@
 ## Todo
-- Loading state (wait for both fonts and API stuff)
+- E-Z following and track/playlist playing via oauth (why not)
+	- Copy Link
 - Force bust the cache (pw protect or something)
-- Endpoint that just lists all the songs (pw protect or something)
+- Endpoint that just lists all the songs
 - Random song
 - About page
 

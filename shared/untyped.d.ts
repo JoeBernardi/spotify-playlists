@@ -1,10 +1,19 @@
 declare module "bent" {
-    const spotify: any;
-    export = spotify;
+    const bent: any;
+    export = bent;
+
+}
+
+declare module "webfontloader" {
+    const webfontloader: any;
+    export = webfontloader;
 }
 
 declare namespace JSX {
     interface IntrinsicElements {
+        [elemName: string]: any;
+    }
+    interface Fragment {
         [elemName: string]: any;
     }
 }

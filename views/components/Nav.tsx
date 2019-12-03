@@ -84,6 +84,7 @@ const Nav = ({ sortedPlaylistIds, playlistsById }: NavProps) => {
 					</section>
 				}
 			</nav>
+			<a href="">Authorize</a>
 		</section>
 	);
 };
