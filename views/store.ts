@@ -18,9 +18,14 @@ export const actions = () => ({
 
 		const sortedPlaylistIds = allPlaylists.map((playlist: Playlist) => playlist.id);
 
+		const allTracks = allPlaylists.reduce((acc: any, playlist: Playlist) => {
+			return acc.concat(playlist.tracks);
+		}, []);
+
 		return {
 			...state,
 			playlistsById,
+			allTracks,
 			sortedPlaylistIds
 		};
 	},
@@ -28,6 +33,7 @@ export const actions = () => ({
 
 export const initialState = {
 	sortedPlaylistIds: [],
+	allTracks: [],
 	playlistsById: {},
 };
 

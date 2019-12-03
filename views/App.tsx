@@ -3,11 +3,12 @@ import { useEffect, useState } from "preact/hooks";
 import { connect } from "unistore/preact";
 import WebFont from "webfontloader";
 
-import { Playlist as PlaylistInterface } from "../shared/interfaces";
+import { Playlist as PlaylistInterface, Track as TrackInterface } from "../shared/interfaces";
 
 import Loader from "./components/Loader";
 import Nav from "./components/Nav";
 import Playlist from "./components/Playlist";
+import PlaylistTracks from "./components/PlaylistTracks";
 
 import { actions } from "./store";
 
@@ -21,6 +22,7 @@ interface AppProps {
 	path: string; // this sucks haha
 	getPlaylists: () => Promise<void>;
 	sortedPlaylistIds: string[];
+	allTracks: TrackInterface[];
 	playlistsById: PlaylistObject;
 	activePlaylistId?: string;
 }
@@ -52,6 +54,10 @@ const appRouter = (props: AppProps) => {
 					/>
 					<section className="content">
 						<Router>
+							<PlaylistTracks
+								path="/everything"
+								tracks={props.allTracks}
+							/>
 							<Playlist
 								path="/id/:activePlaylistId?"
 								playlistsById={props.playlistsById}
