@@ -83,6 +83,9 @@ const Nav = ({ sortedPlaylistIds, playlistsById }: NavProps) => {
 						{navByYear}
 					</section>
 				}
+				<section className="nav-meta">
+					<Link activeClassName="active" className="nav-meta-title" href="/about">About</Link>
+				</section>
 			</nav>
 		</section>
 	);

@@ -5,14 +5,16 @@ body, html {
 }
 
 .wrapper {
-	display: flex;
-
 	.sidebar {
 		padding: 15px 2%;
 		background: $dark;
 		width: 16%;
-		min-height: 100vh;
+		min-width: 130px;
+		height: 100vh;
 		border-right: 1px solid $accent;
+		position: fixed;
+		display: flex;
+		flex-direction: column;	
 
 		header {
 			margin-bottom: 15px;
@@ -31,63 +33,91 @@ body, html {
 		}
 
 		nav {
-			.nav-playlists-year {
-				margin-bottom: 16px;
+			display: flex;
+			flex-direction: column;
+			flex: 1;
 
-				&-header {
-					color: $accent;
-					font-family: $sans;
-					font-size: 24px;
-					margin: 0 0 8px;
-					border-bottom: 1px solid $accent;
-					cursor: pointer;
-					display: flex;
-					justify-content: space-between;
+			.nav-playlists {
+				flex: 1;
 
-					&-title {
-						margin: 0;
-					}
+				&-year {
+					margin-bottom: 16px;
 
-					&-icon {
-						transform: scale(0.7);
-						align-self: center;
-					}
+					&-header {
+						color: $accent;
+						font-family: $sans;
+						font-size: 24px;
+						margin: 0 0 8px;
+						border-bottom: 1px solid $accent;
+						cursor: pointer;
+						display: flex;
+						justify-content: space-between;
 
-					&:hover {
-						.nav-playlists-year-header-icon {
-							color: $gray;
+						&-title {
+							margin: 0;
 						}
-					}
-				}
 
-				&-playlists {
-					transition: max-height 0.2s ease-out;
-					max-height: 0;
-					overflow: hidden;
-
-					.nav-item {
-						font-family: $mono;
-						text-decoration: none;
-						color: $light;
-						letter-spacing: 0.025em;
-						font-size: 14px;
-						line-height: 20px;
-						display: block;
-						margin-bottom: 6px;
-
-						&.active {
-							color: $accent;
+						&-icon {
+							transform: scale(0.7);
+							align-self: center;
 						}
 
 						&:hover {
-							color: $gray;
+							.nav-playlists-year-header-icon {
+								color: $gray;
+							}
+						}
+					}
+
+					&-playlists {
+						transition: max-height 0.2s ease-out;
+						max-height: 0;
+						overflow: hidden;
+
+						.nav-item {
+							font-family: $mono;
+							text-decoration: none;
+							color: $light;
+							letter-spacing: 0.025em;
+							font-size: 14px;
+							line-height: 20px;
+							display: block;
+							margin-bottom: 6px;
+
+							&.active {
+								color: $accent;
+							}
+
+							&:hover {
+								color: $gray;
+							}
+						}
+					}
+
+					&.active {
+						.nav-playlists-year-playlists {
+							max-height: 280px;
 						}
 					}
 				}
+			}
 
-				&.active {
-					.nav-playlists-year-playlists {
-						max-height: 280px;
+			.nav-meta {
+				margin-bottom: 25px;
+
+				&-title {
+					color: $accent;
+					font-family: $sans;
+					font-size: 22px;
+					margin: 0 0 8px;
+					border-bottom: 1px solid $accent;
+					text-decoration: none;
+					font-weight: 800;
+					width: 100%;
+					display: block;
+
+					&:hover {
+						color: $gray;
 					}
 				}
 			}
@@ -96,7 +126,10 @@ body, html {
 
 	.content {
 		flex: 1;
-		padding: 15px 45px;
+		padding: 15px 45px 15px 20%;
+		margin-left: 2%;
+		min-height: calc(100vh - 30px);
+		max-width: calc(100vw - 130px);
 		background: $dark-alternate;
 
 		.playlist {
@@ -224,6 +257,26 @@ body, html {
 						&:hover {
 							color: $dark;
 						}
+					}
+				}
+			}
+		}
+
+		.copy {
+			margin-top: 13px;
+
+			p {
+				font-family: $sans;
+				color: $light;
+				width: 485px;
+				font-size: 13px;
+				line-height: 24px;
+
+				a {
+					color: $light;
+
+					&:hover {
+						color: $gray;
 					}
 				}
 			}

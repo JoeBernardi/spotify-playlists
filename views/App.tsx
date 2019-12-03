@@ -5,6 +5,7 @@ import WebFont from "webfontloader";
 
 import { Playlist as PlaylistInterface, Track as TrackInterface } from "../shared/interfaces";
 
+import About from "./components/About";
 import Loader from "./components/Loader";
 import Nav from "./components/Nav";
 import Playlist from "./components/Playlist";
@@ -54,6 +55,9 @@ const appRouter = (props: AppProps) => {
 					/>
 					<section className="content">
 						<Router>
+							<About
+								path="/about"
+							/>
 							<PlaylistTracks
 								path="/everything"
 								tracks={props.allTracks}
