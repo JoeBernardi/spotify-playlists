@@ -8,7 +8,6 @@
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
     "build": "parcel build server/server.ts --target node",
-    "prestart": "yarn build",
     "start": "yarn start-server",
     "watch": "NODE_ENV=development parcel watch ./server/server.ts --target node & NODE_ENV=development parcel watch ./views/Main.tsx",
     "dev": "yarn watch & yarn start-server",
@@ -29,6 +28,7 @@
     "express": "^4.17.1",
     "js-yaml": "^3.13.1",
     "node-cache": "^5.0.2",
+    "nodemon": "^2.0.0",
     "preact": "^10.0.5",
     "preact-async-route": "^2.2.1",
     "preact-router": "^3.1.0",
@@ -51,7 +51,6 @@
     "@types/express": "^4.17.2",
     "@types/node": "^12.12.11",
     "autoprefixer": "^9.7.2",
-    "nodemon": "^2.0.0",
     "parcel-bundler": "^1.12.4",
     "postcss-preset-env": "^6.7.0",
     "prettier": "1.18.2",
