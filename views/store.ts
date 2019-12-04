@@ -6,11 +6,12 @@ import { Playlist, Track } from "../shared/interfaces";
 
 import { millisecondsToReadableTime } from "../shared/helpers";
 
-const getJson = bent("GET", "json", `${process.env.PROTOCOL}${process.env.HOST}:${process.env.PORT}`, 200, 422, 500);
+const getJson = bent("GET", "json", 200, 422, 500);
 
 export const actions = () => ({
 	getPlaylists: async (state: object): Promise<object> => {
-		const allPlaylists = await getJson("/playlists")
+		console.log(`${window.location.protocol}//${window.location.host}/playlists`);
+		const allPlaylists = await getJson(`${window.location.protocol}//${window.location.host}/playlists`)
 			.catch((e: Error) => Promise.reject(e));
 
 		const playlistsById = allPlaylists.reduce((byId: any, playlist: Playlist) => {

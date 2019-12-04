@@ -3,6 +3,8 @@ import path from "path";
 
 import { authAndFetchPlaylists, getEnv } from "./helpers";
 
+getEnv();
+
 const app = express();
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "/")));

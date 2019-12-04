@@ -9,6 +9,8 @@ import { cacheKey, cacheTTLInSeconds, months, playlistLimit } from "./consts";
 
 export const getEnv = (): any => dotenv.config().parsed;
 
+getEnv();
+
 const playlistCache: NodeCache = new NodeCache({ stdTTL: cacheTTLInSeconds });
 
 const apiInstance = new SpotifyWebApi({
@@ -20,7 +22,10 @@ const getPlaylists = async (spotifyAPI: SpotifyWebApi): Promise<object[] | Error
 	let playlists: object[] = [];
 
 	const getPlaylistsFromServer = async (offset = 0): Promise<object[]> => {
-		const data = await spotifyAPI.getUserPlaylists(process.env.SPOTIFY_USER, {
+		const username: string | undefined = process.env.SPOTIFY_USER;
+
+		if (!username) { return Promise.reject(Error("Bad username")); }
+		const data = await spotifyAPI.getUserPlaylists(username, {
 			limit: playlistLimit,
 			offset
 		});
@@ -106,6 +111,7 @@ export const authAndFetchPlaylists = async (): Promise<Playlist[] | Error> => {
 	}
 
 	const data = await apiInstance.clientCredentialsGrant();
+
 	const { access_token } = data.body;
 	apiInstance.setAccessToken(access_token);
 
