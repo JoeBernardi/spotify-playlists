@@ -12,15 +12,15 @@ export const getEnv = (): any => dotenv.config().parsed;
 const playlistCache: NodeCache = new NodeCache({ stdTTL: cacheTTLInSeconds });
 
 const apiInstance = new SpotifyWebApi({
-	clientId: getEnv().SPOTIFY_CLIENT_ID,
-	clientSecret: getEnv().SPOTIFY_SECRET
+	clientId: process.env.SPOTIFY_CLIENT_ID,
+	clientSecret: process.env.SPOTIFY_SECRET
 });
 
 const getPlaylists = async (spotifyAPI: SpotifyWebApi): Promise<object[] | Error> => {
 	let playlists: object[] = [];
 
 	const getPlaylistsFromServer = async (offset = 0): Promise<object[]> => {
-		const data = await spotifyAPI.getUserPlaylists(getEnv().SPOTIFY_USER, {
+		const data = await spotifyAPI.getUserPlaylists(process.env.SPOTIFY_USER, {
 			limit: playlistLimit,
 			offset
 		});
