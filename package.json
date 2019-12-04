@@ -38,7 +38,7 @@
     "webfontloader": "^1.6.28"
   },
   "engines": {
-    "node": ">=10"
+    "node": "10.16.3"
   },
   "devDependencies": {
     "@babel/core": "^7.7.2",
