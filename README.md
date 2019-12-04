@@ -1,1 +1,1 @@
-song
+- stats in about page (song length, song amount)

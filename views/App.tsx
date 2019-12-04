@@ -22,6 +22,7 @@ interface PlaylistObject {
 interface AppProps {
 	path: string; // this sucks haha
 	getPlaylists: () => Promise<void>;
+	totalTrackLength: number;
 	sortedPlaylistIds: string[];
 	allTracks: TrackInterface[];
 	playlistsById: PlaylistObject;
@@ -57,6 +58,8 @@ const appRouter = (props: AppProps) => {
 						<Router>
 							<About
 								path="/about"
+								totalTrackLength={props.totalTrackLength}
+								totalTrackCount={props.allTracks.length}
 							/>
 							<PlaylistTracks
 								path="/everything"

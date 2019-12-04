@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import NodeCache from "node-cache";
 import SpotifyWebApi from "spotify-web-api-node";
 
+import { millisecondsToReadableTime } from "../shared/helpers";
 import { Artist, Playlist, Track } from "../shared/interfaces";
 
 import { cacheKey, cacheTTLInSeconds, months, playlistLimit } from "./consts";
@@ -66,18 +67,12 @@ const normalizeTracks = (tracksFromApi: any[]): Track[] => {
 			url: track.track.album.external_urls.spotify,
 		};
 
-		const nearestDurationSecond = 1000 * Math.round(duration_ms / 1000);
-		const durationDate = new Date(nearestDurationSecond);
-		const durationMinutes = durationDate.getUTCMinutes();
-		const durationSeconds = durationDate.getUTCSeconds();
-
 		return {
 			url: track.track.external_urls.spotify as string,
 			artist: artists,
 			length: {
 				total_ms: duration_ms,
-				minutes: durationMinutes.toString(),
-				seconds: (durationSeconds < 10 ? "0" : "") + durationSeconds;
+				readable_length: millisecondsToReadableTime(duration_ms),
 			},
 			album,
 			preview_url,

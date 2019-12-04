@@ -2,7 +2,9 @@ import bent from "bent";
 import createStore from "unistore";
 import devtools from "unistore/devtools";
 
-import { Playlist } from "../shared/interfaces";
+import { Playlist, Track } from "../shared/interfaces";
+
+import { millisecondsToReadableTime } from "../shared/helpers";
 
 const getJson = bent("GET", "json", `${process.env.PROTOCOL}${process.env.HOST}:${process.env.PORT}`, 200, 422, 500);
 
@@ -22,9 +24,14 @@ export const actions = () => ({
 			return acc.concat(playlist.tracks);
 		}, []);
 
+		const totalTrackLength = millisecondsToReadableTime(allTracks.reduce((acc: number, track: Track) => {
+			return acc + track.length.total_ms;
+		}, 0));
+
 		return {
 			...state,
 			playlistsById,
+			totalTrackLength,
 			allTracks,
 			sortedPlaylistIds
 		};
@@ -32,6 +39,7 @@ export const actions = () => ({
 });
 
 export const initialState = {
+	totalTrackLength: 0,
 	sortedPlaylistIds: [],
 	allTracks: [],
 	playlistsById: {},

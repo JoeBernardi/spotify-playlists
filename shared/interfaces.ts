@@ -3,8 +3,7 @@ export interface Track {
 	album: Album;
 	length: {
 		total_ms: number;
-		minutes: string;
-		seconds: string;
+		readable_length: string;
 	};
 	preview_url: string;
 	title: string;

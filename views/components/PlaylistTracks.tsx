@@ -21,14 +21,13 @@ const PlaylistTracks = ({ tracks }: PlaylistTracksProps) => {
 			{tracks.map((track) => {
 				const artists = track.artist
 					.map((artist) => `<a target="_blank" href="${artist.url}">${artist.name}</a>`).join(", ");
-				const readableLength = `${track.length.minutes}:${track.length.seconds}`;
 
 				return (
 					<tr className="playlist-tracks-track">
 						<td className="playlist-tracks-track-info"><a target="_blank" href={track.url}>{track.title}</a></td>
 						<td className="playlist-tracks-track-info" dangerouslySetInnerHTML={{__html: artists}} />
 						<td className="playlist-tracks-track-info"><a target="_blank" href={track.album.url}>{track.album.name}</a></td>
-						<td className="playlist-tracks-track-info">{readableLength}</td>
+						<td className="playlist-tracks-track-info">{track.length.readable_length}</td>
 					</tr>
 				);
 			})}
