@@ -13,7 +13,7 @@ const About = ({ totalTrackLength, totalTrackCount }: AboutProps) => {
 		<section className="copy">
 			<img src={LikesSong} />
 
-			<p><strong>{totalTrackCount}</strong> tunes totaling <strong>{totalTrackLength}</strong> minutes.</p>
+			<p><strong>{totalTrackCount}</strong> tunes totaling <strong>{totalTrackLength}</strong>.</p>
 
 			<p>Awhile ago I started making playlists every month. I think it was directly inspired by John Olson's
 			SUNDAZE OLZONE playlists, but lots of people do it. It's a nice way to keep track of
