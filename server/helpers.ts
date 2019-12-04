@@ -13,8 +13,7 @@ const playlistCache: NodeCache = new NodeCache({ stdTTL: cacheTTLInSeconds });
 
 const apiInstance = new SpotifyWebApi({
 	clientId: getEnv().SPOTIFY_CLIENT_ID,
-	clientSecret: getEnv().SPOTIFY_SECRET,
-	redirectUri: getEnv().REDIRECT_URI
+	clientSecret: getEnv().SPOTIFY_SECRET
 });
 
 const getPlaylists = async (spotifyAPI: SpotifyWebApi): Promise<object[] | Error> => {
