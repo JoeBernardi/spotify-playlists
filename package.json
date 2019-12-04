@@ -6,11 +6,11 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "prebuild": "ls",
-    "build": "NODE_ENV=production parcel build server/server.ts --target node & NODE_ENV=production parcel build views/Main.tsx",
+    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
+    "build": "parcel build server/server.ts --target node & parcel build views/Main.tsx",
     "prestart": "yarn build",
     "start": "yarn start-server",
-    "watch": "NODE_ENV=development parcel watch server/server.ts --target node & NODE_ENV=development parcel watch views/Main.tsx",
+    "watch": "NODE_ENV=development parcel watch ./server/server.ts --target node & NODE_ENV=development parcel watch ./views/Main.tsx",
     "dev": "yarn watch & yarn start-server",
     "start-server": "nodemon --exec node ./dist/server.js"
   },
