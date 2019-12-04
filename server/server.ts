@@ -20,7 +20,7 @@ app.get("*", async (_req, res) => {
 });
 
 app.listen(getEnv().PORT, () => {
-	console.log(`Listening on port ${getEnv().PORT}!`);
+	console.log(`Listening on port ${process.env.PORT}!`);
 });
 
 process.on("SIGINT", () => {
