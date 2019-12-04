@@ -19,7 +19,7 @@ app.get("*", async (_req, res) => {
 	return res.render("templates/index", { state });
 });
 
-app.listen(getEnv().PORT, () => {
+app.listen(process.env.PORT, () => {
 	console.log(`Listening on port ${process.env.PORT}!`);
 });
 
