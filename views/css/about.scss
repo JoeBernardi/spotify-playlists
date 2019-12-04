@@ -1,0 +1,25 @@
+.wrapper .content {
+	.copy {
+		margin-top: 13px;
+
+		img {
+			max-width: 100%;
+		}
+
+		p {
+			font-family: $sans;
+			color: $light;
+			width: 70%;
+			font-size: 13px;
+			line-height: 24px;
+
+			a {
+				color: $light;
+
+				&:hover {
+					color: $gray;
+				}
+			}
+		}
+	}
+}

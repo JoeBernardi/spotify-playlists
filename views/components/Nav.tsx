@@ -12,6 +12,7 @@ interface PlaylistObject {
 }
 
 interface NavProps {
+	path?: string;
 	sortedPlaylistIds: string[];
 	playlistsById: PlaylistObject;
 }

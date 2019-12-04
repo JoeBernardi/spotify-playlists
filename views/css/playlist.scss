@@ -1,0 +1,140 @@
+.content {
+	.playlist {
+		&-info {
+			display: flex;
+			margin-bottom: 24px;
+
+			&-image {
+				height: 200px;
+
+				img {	
+					width: 200px;
+					height: 200px;
+					object-fit: cover;
+				}
+			}
+
+			&-text {
+				margin-left: 25px;
+				display: flex;
+				flex-direction: column;
+
+				&-header {
+					display: flex;
+
+					&-nav {
+						&-wrapper {
+							align-self: center;
+						}
+
+						&-button {
+							display: none;
+						}
+					}
+
+					&-title {
+						text-decoration: none;
+						font-size: 36px;
+						margin: 0;
+						color: $light;	
+						font-family: $sans;
+						font-weight: 700;
+					}
+
+					&-link-icon {
+						display: block;
+						margin-left: 16px;
+						color: $light;
+						transform: scale(0.7);
+
+						&:hover {
+							color: $accent;
+						}
+					}
+				}
+
+				&-description {
+					margin: auto 0 0;
+					font-size: 13px;
+					line-height: 24px;
+					border-top: 1px solid $gray;
+					border-bottom: 1px solid $gray;
+					padding: 18px 0;
+					color: $light;
+					font-family: $sans;
+					font-weight: 300;
+					width: 80%;
+				}
+			}
+		}
+
+		&-tracks {
+			border-collapse: collapse;
+			width: 100%;
+			margin-bottom: 32px;
+
+			&-info {
+				font-family: $sans;
+				text-decoration: none;
+				color: $light;
+				letter-spacing: 0.025em;
+				font-size: 12px;
+				margin-bottom: 6px;
+				text-align: left;
+				text-transform: uppercase;
+				font-size: 12px;
+				letter-spacing: .125em;
+				border-bottom: 1px solid $gray;
+
+				&-type {
+					padding: 0 10px 0 0;
+					font-weight: 600;
+
+					&.icon {
+						transform: scale(0.55);
+					}
+
+					&:first-of-type {
+						padding: 0 10px;
+					}
+				}
+			}
+
+			&-track {
+				font-family: $mono;
+				color: $light;
+				font-size: 12px;
+				border-bottom: 1px solid $gray;
+
+				&:hover {
+					background: $accent;
+				}
+
+				&:last-of-type {
+					border: 0;
+				}
+
+				&-info {
+					padding: 7px 13px 7px 0;
+
+					&:last-of-type {
+						padding: 10px 0;
+					}
+
+					&:first-of-type {
+						padding: 10px 13px;
+					}
+				}
+
+				a {
+					color: $light;
+					text-decoration: none;
+
+					&:hover {
+						color: $dark;
+					}
+				}
+			}
+		}
+	}	
+}

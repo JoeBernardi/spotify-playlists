@@ -7,6 +7,7 @@ import { Playlist as PlaylistInterface, Track as TrackInterface } from "../share
 
 import About from "./components/About";
 import Loader from "./components/Loader";
+import MobileFooter from "./components/MobileFooter";
 import Nav from "./components/Nav";
 import Playlist from "./components/Playlist";
 import PlaylistTracks from "./components/PlaylistTracks";
@@ -67,15 +68,23 @@ const appRouter = (props: AppProps) => {
 							/>
 							<Playlist
 								path="/id/:activePlaylistId?"
+								sortedPlaylistIds={props.sortedPlaylistIds}
+								playlistsById={props.playlistsById}
+							/>
+							<Nav
+								path="/nav"
+								sortedPlaylistIds={props.sortedPlaylistIds}
 								playlistsById={props.playlistsById}
 							/>
 							<Playlist
 								path="/"
+								sortedPlaylistIds={props.sortedPlaylistIds}
 								playlistsById={props.playlistsById}
 								activePlaylistId={props.sortedPlaylistIds[0]}
 							/>
 						</Router>
 					</section>
+					<MobileFooter />
 				</section>
 			}
 			{!isLoaded

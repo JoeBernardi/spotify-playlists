@@ -1,0 +1,170 @@
+
+@media screen and (max-width: 600px) {
+	.content {
+		.playlist {
+			&-info {
+				flex-direction: column;
+				align-items: center;
+
+				&-text {
+					margin-left: 0;
+					width: 100%;
+
+					&-header {
+						flex-direction: column;
+						margin-bottom: 25px;
+
+						&-title {
+							text-align: center;
+							margin: 10px 0 25px;
+						}
+					}
+
+					&-description {
+						width: 100%;
+						margin-bottom: 25px;
+					}
+				}
+			}
+
+			&-tracks {
+				&-info {
+					&-type {
+						&.album, &.length {
+							display: none;
+						}
+					}
+				}
+
+				&-track {
+					&-info {
+						&.album, &.length {
+							display: none;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 430px) {
+	.wrapper {
+		padding-bottom: 45px;
+
+		> .sidebar {
+			display: none;
+		}
+
+		.content {
+			.copy {
+				p {
+					width: 100%;
+				}
+			}
+
+			.playlist {
+				&-info {
+					&-text {
+						&-header {
+							&-link-icon {
+								flex: 1;
+								margin: 0;
+								text-align: center;
+							}
+
+							&-title {
+								font-size: 30px;
+							}
+
+							&-nav {
+								display: block;
+
+								&-wrapper {
+									width: 100%;
+									display: flex;
+								}
+
+								&-button {
+									display: block;
+									color: $light;
+									font-family: $mono;
+									font-size: 13px;
+
+									&:disabled {
+										opacity: .4;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			.sidebar {
+				width: 100%;
+				padding: 0;
+				background: $dark-alternate;
+				border: 0;
+
+				header {
+					.hero {
+						text-align: center;
+					}
+				}
+
+				.nav {
+					&-playlists {
+						&-year {
+							&-header {
+								&-title {
+									text-align: center;
+									width: 100%;
+								}
+
+								&-icon {
+									display: none;
+								}
+							}
+
+							&-playlists {
+								max-height: 374px;
+
+								.nav-item {
+									text-align: center;
+									font-size: 18px;
+									line-height: 28px;
+								}
+							}
+						}
+					}
+
+					&-meta {
+						display: none;
+					}
+				}
+			}
+		}
+
+		.mobile-footer {
+			display: block;
+			position: fixed;
+			bottom: 0;
+			background: $dark;
+			width: 100%;
+			height: 45px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			a {
+				padding: 10px;
+				display: block;
+				color: $light;
+				font-family: $mono;
+				font-size: 13px;
+				text-decoration: none;
+			}
+
+		}
+	}
+}
