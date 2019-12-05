@@ -19,12 +19,19 @@ interface TrackObject {
 interface NavProps {
 	path?: string;
 	activeTrackId: string;
+	setActiveTrack: (trackId: string) => void;
 	sortedPlaylistIds: string[];
 	playlistsById: PlaylistObject;
 	tracksById: TrackObject;
 }
 
-const Nav = ({ sortedPlaylistIds, playlistsById, activeTrackId, tracksById }: NavProps) => {
+const Nav = ({
+		sortedPlaylistIds,
+		playlistsById,
+		activeTrackId,
+		tracksById,
+		setActiveTrack,
+	}: NavProps) => {
 	const [activeYear, setActiveYear] = useState("");
 
 	const toggleYear = (year: string) => {
@@ -92,7 +99,10 @@ const Nav = ({ sortedPlaylistIds, playlistsById, activeTrackId, tracksById }: Na
 					</section>
 				}
 				{!!(tracksById && tracksById[activeTrackId])
-					&& <Player track={tracksById[activeTrackId]} />
+					&& <Player
+						track={tracksById[activeTrackId]}
+						setActiveTrack={setActiveTrack}
+					/>
 				}
 				<section className="nav-meta">
 					<Link activeClassName="active" className="nav-meta-title" href="/about">About</Link>

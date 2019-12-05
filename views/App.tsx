@@ -26,7 +26,7 @@ interface TrackObject {
 
 interface AppProps {
 	getPlaylists: () => Promise<void>;
-	setActiveTrack: () => void;
+	setActiveTrack: (trackId: string) => void;
 	activeTrackId: string;
 	totalTrackLength: number;
 	sortedPlaylistIds: string[];
@@ -61,6 +61,7 @@ const appRouter = (props: AppProps) => {
 						playlistsById={props.playlistsById}
 						activeTrackId={props.activeTrackId}
 						tracksById={props.tracksById}
+						setActiveTrack={props.setActiveTrack}
 					/>
 					<section className="content">
 						<Router>
