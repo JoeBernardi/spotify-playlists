@@ -20,13 +20,19 @@ interface PlaylistObject {
 	[key: string]: PlaylistInterface;
 }
 
+interface TrackObject {
+	[key: string]: TrackInterface;
+}
+
 interface AppProps {
-	path: string; // this sucks haha
 	getPlaylists: () => Promise<void>;
+	setActiveTrack: () => void;
+	activeTrackId: string;
 	totalTrackLength: number;
 	sortedPlaylistIds: string[];
 	allTracks: TrackInterface[];
 	playlistsById: PlaylistObject;
+	tracksById: TrackObject;
 	activePlaylistId?: string;
 }
 
@@ -46,7 +52,6 @@ const appRouter = (props: AppProps) => {
 	}, []);
 
 	const isLoaded = fontsLoaded && !!props.sortedPlaylistIds.length;
-
 	return (
 		<div>
 			{isLoaded
@@ -54,6 +59,8 @@ const appRouter = (props: AppProps) => {
 					<Nav
 						sortedPlaylistIds={props.sortedPlaylistIds}
 						playlistsById={props.playlistsById}
+						activeTrackId={props.activeTrackId}
+						tracksById={props.tracksById}
 					/>
 					<section className="content">
 						<Router>
@@ -65,22 +72,30 @@ const appRouter = (props: AppProps) => {
 							<PlaylistTracks
 								path="/everything"
 								tracks={props.allTracks}
+								setActiveTrack={props.setActiveTrack}
+								activeTrackId={props.activeTrackId}
 							/>
 							<Playlist
 								path="/id/:activePlaylistId?"
 								sortedPlaylistIds={props.sortedPlaylistIds}
 								playlistsById={props.playlistsById}
+								setActiveTrack={props.setActiveTrack}
+								activeTrackId={props.activeTrackId}
 							/>
 							<Nav
 								path="/nav"
+								activeTrackId={props.activeTrackId}
 								sortedPlaylistIds={props.sortedPlaylistIds}
 								playlistsById={props.playlistsById}
+								tracksById={props.tracksById}
 							/>
 							<Playlist
 								path="/"
 								sortedPlaylistIds={props.sortedPlaylistIds}
 								playlistsById={props.playlistsById}
 								activePlaylistId={props.sortedPlaylistIds[0]}
+								setActiveTrack={props.setActiveTrack}
+								activeTrackId={props.activeTrackId}
 							/>
 						</Router>
 					</section>

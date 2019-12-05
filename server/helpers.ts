@@ -57,6 +57,7 @@ const normalizeTracks = (tracksFromApi: any[]): Track[] => {
 			name,
 			duration_ms,
 			preview_url,
+			id,
 		} = track.track;
 
 		const artists = track.track.artists.map((artist: any): Artist => {
@@ -72,7 +73,8 @@ const normalizeTracks = (tracksFromApi: any[]): Track[] => {
 		};
 
 		return {
-			url: track.track.external_urls.spotify as string,
+			url: track.track.external_urls.spotify,
+			image: track.track.album.images[1].url,
 			artist: artists,
 			length: {
 				total_ms: duration_ms,
@@ -80,6 +82,7 @@ const normalizeTracks = (tracksFromApi: any[]): Track[] => {
 			},
 			album,
 			preview_url,
+			id,
 			title: name,
 		};
 	});

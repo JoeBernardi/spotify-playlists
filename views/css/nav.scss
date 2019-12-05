@@ -3,9 +3,10 @@
 		display: flex;
 		flex-direction: column;
 		flex: 1;
+		height: 300px;
 
 		.nav-playlists {
-			flex: 1;
+			flex-grow: 2;
 
 			&-year {
 				margin-bottom: 16px;
@@ -69,7 +70,23 @@
 			}
 		}
 
+		.nav-player {
+			flex: 0 1;
+
+			&-image {
+				max-height: 200px;
+
+				img {	
+					width: 200px;
+					height: 200px;
+					object-fit: cover;
+				}
+			}
+		}
+
 		.nav-meta {
+			flex: 0 1;
+
 			&-title {
 				color: $accent;
 				font-family: $sans;

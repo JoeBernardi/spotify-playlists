@@ -1,28 +1,35 @@
 import { Link } from "preact-router/match";
 import { useState } from "preact/hooks";
-import { Playlist } from "../../shared/interfaces";
+import { Playlist, Track } from "../../shared/interfaces";
 
 import MinusIcon from "../img/icons/minus.svg";
 import PlusIcon from "../img/icons/plus.svg";
 
 import NavItem from "./NavItem";
+import Player from "./Player";
 
 interface PlaylistObject {
 	[key: string]: Playlist;
 }
 
-interface NavProps {
-	path?: string;
-	sortedPlaylistIds: string[];
-	playlistsById: PlaylistObject;
+interface TrackObject {
+	[key: string]: Track;
 }
 
-const Nav = ({ sortedPlaylistIds, playlistsById }: NavProps) => {
-	const [activeYear, setActiveYear] = useState(null);
+interface NavProps {
+	path?: string;
+	activeTrackId: string;
+	sortedPlaylistIds: string[];
+	playlistsById: PlaylistObject;
+	tracksById: TrackObject;
+}
 
-	const toggleYear = (year) => {
+const Nav = ({ sortedPlaylistIds, playlistsById, activeTrackId, tracksById }: NavProps) => {
+	const [activeYear, setActiveYear] = useState("");
+
+	const toggleYear = (year: string) => {
 		if (year === activeYear) {
-			return setActiveYear(null);
+			return setActiveYear("");
 		}
 
 		return setActiveYear(year);
@@ -83,6 +90,9 @@ const Nav = ({ sortedPlaylistIds, playlistsById }: NavProps) => {
 					&& <section className="nav-playlists">
 						{navByYear}
 					</section>
+				}
+				{!!(tracksById && tracksById[activeTrackId])
+					&& <Player track={tracksById[activeTrackId]} />
 				}
 				<section className="nav-meta">
 					<Link activeClassName="active" className="nav-meta-title" href="/about">About</Link>

@@ -117,6 +117,16 @@
 				&-info {
 					padding: 7px 13px 7px 0;
 
+					&.preview-icon {
+						svg {
+							margin-top: 2px;
+							cursor: pointer;
+							&:hover {
+								color: $dark-alternate;
+							}
+						}
+					}
+
 					&:last-of-type {
 						padding: 10px 0;
 					}

@@ -13,12 +13,21 @@ interface PlaylistObject {
 
 interface PlaylistProps {
 	path: string;
+	activeTrackId: string;
+	setActiveTrack: () => void;
 	playlistsById: PlaylistObject;
 	sortedPlaylistIds: string[];
 	activePlaylistId?: string;
 }
 
-const Playlist = ({ playlistsById, activePlaylistId, sortedPlaylistIds }: PlaylistProps) => {
+const Playlist = ({
+		playlistsById,
+		activePlaylistId,
+		sortedPlaylistIds,
+		activeTrackId,
+		setActiveTrack
+	}: PlaylistProps) => {
+
 	if (!activePlaylistId || Object.keys(playlistsById).length === 0) { return <div>LOD</div>; }
 	if (!playlistsById[activePlaylistId]) { return <div>Ya goofd</div>; }
 
@@ -82,7 +91,11 @@ const Playlist = ({ playlistsById, activePlaylistId, sortedPlaylistIds }: Playli
 					}
 				</div>
 			</div>
-			<PlaylistTracks tracks={playlist.tracks} />
+			<PlaylistTracks
+				tracks={playlist.tracks}
+				activeTrackId={activeTrackId}
+				setActiveTrack={setActiveTrack}
+			/>
 		</section>
 	);
 };
