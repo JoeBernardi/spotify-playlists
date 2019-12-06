@@ -1,6 +1,8 @@
 import express from "express";
 import path from "path";
 
+import admin from "./admin";
+
 import { authAndFetchPlaylists, getEnv } from "./helpers";
 
 getEnv();
@@ -8,6 +10,10 @@ getEnv();
 const app = express();
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "/")));
+
+if (process.env.ADMIN_USERNAME && process.env.ADMIN_PASS) {
+	app.use("/admin", admin);
+}
 
 app.get("/playlists", async (_req, res) => {
 		const playlists = await authAndFetchPlaylists()

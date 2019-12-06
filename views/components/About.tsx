@@ -11,7 +11,14 @@ interface AboutProps {
 const About = ({ totalTrackLength, totalTrackCount }: AboutProps) => {
 	return (
 		<section className="copy">
-			<img src={LikesSong} />
+			<figure>
+				<img src={LikesSong} alt="Barbara Bush's favorite country song is &ldquo;Don't Come Home From Drinkin' With Lovin' On Your Mind&rdquo;" />
+				<figcaption>
+					Title c/o Jack Handey and Army Man, <a href="https://en.wikipedia.org/wiki/Army_Man_(magazine)">
+						America's Only Magazine
+					</a>.
+				</figcaption>
+			</figure>
 
 			<p><strong>{totalTrackCount}</strong> tunes totaling <strong>{totalTrackLength}</strong>.</p>
 

@@ -2,8 +2,26 @@
 	.copy {
 		margin-top: 13px;
 
-		img {
-			max-width: 100%;
+		figure {
+			margin: 0;
+
+			img {
+				max-width: 100%;
+			}
+
+			figcaption {
+				font-size: 11px;
+				font-family: $sans;
+				color: $light;
+
+				a {
+					color: $light;
+
+					&:hover {
+						color: $gray;
+					}
+				}
+			}
 		}
 
 		p {
