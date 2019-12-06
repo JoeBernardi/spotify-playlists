@@ -12,9 +12,6 @@ declare namespace JSX {
     interface IntrinsicElements {
         [elemName: string]: any;
     }
-    interface Fragment {
-        [elemName: string]: any;
-    }
 }
 
 declare module "*.svg" {
