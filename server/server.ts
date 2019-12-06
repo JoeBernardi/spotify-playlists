@@ -16,10 +16,10 @@ if (process.env.ADMIN_USERNAME && process.env.ADMIN_PASS) {
 }
 
 app.get("/playlists", async (_req, res) => {
-		const playlists = await authAndFetchPlaylists()
-			.catch((e: Error) => Promise.reject(e));
+	const playlists = await authAndFetchPlaylists()
+		.catch((e: Error) => Promise.reject(e));
 
-		return res.send(playlists);
+	return res.send(playlists);
 });
 
 app.get("*", async (_req, res) => {

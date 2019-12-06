@@ -1,8 +1,7 @@
 import express from "express";
 import basicAuth from "express-basic-auth";
-import NodeCache from "node-cache";
 
-import { cacheKey, cacheTTLInSeconds } from "./consts";
+import { cacheKey } from "./consts";
 import { getEnv, playlistCache } from "./helpers";
 
 getEnv();
