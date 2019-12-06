@@ -40,6 +40,8 @@ const About = ({ totalTrackLength, totalTrackCount }: AboutProps) => {
 			Despite all that, the first song is typically there for a reason, usually an artist that passed away
 			that month, but sometimes just something that hit especially hard. I try to stash
 			the weirder/longer tunes towards the end. Music is cool.</p>
+
+			<p>&mdash; <a href="http://joe.industries">Joe B.</a></p>
 		</section>
 	);
 };
