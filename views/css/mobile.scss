@@ -1,13 +1,9 @@
 
 @media screen and (max-width: 600px) {
-	body, html {
-		overflow: hidden!important;
-	}
 	.wrapper {
 		.content {
-			max-height: calc(100vh - 45px);
+			max-height: calc(100vh - 100px);
 			padding-top: 0;
-			padding-bottom: 80px;
 			.playlist {
 				&-info {
 					padding-top: 35px;
