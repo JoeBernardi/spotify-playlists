@@ -6,7 +6,7 @@ export const millisecondsToReadableTime = (timeInMilliseconds: number): string =
 	const durationSeconds = durationDate.getUTCSeconds();
 	const readableSeconds = (durationSeconds < 10 ? "0" : "") + durationSeconds;
 
-	return (durationHours ? `${durationHours}:` : "" ) + `${durationMinutes}:${readableSeconds}`;
+	return (durationHours ? `${durationHours} hours, ` : "" ) + `${durationMinutes} minutes, and ${readableSeconds} seconds`;
 };
 
 export default {
