@@ -1,45 +1,52 @@
 
 @media screen and (max-width: 600px) {
-	.content {
-		.playlist {
-			&-info {
-				flex-direction: column;
-				align-items: center;
-
-				&-text {
-					margin-left: 0;
-					width: 100%;
-
-					&-header {
-						flex-direction: column;
-						margin-bottom: 25px;
-
-						&-title {
-							text-align: center;
-							margin: 10px 0 25px;
-						}
-					}
-
-					&-description {
-						width: 100%;
-						margin-bottom: 25px;
-					}
-				}
-			}
-
-			&-tracks {
+	.wrapper {
+		.content {
+			max-height: calc(100vh - 45px);
+			padding-top: 0;
+			padding-bottom: 0;
+			.playlist {
 				&-info {
-					&-type {
-						&.album, &.length {
-							display: none;
+					padding-top: 35px;
+					flex-direction: column;
+					align-items: center;
+
+					&-text {
+						margin-left: 0;
+						width: 100%;
+
+						&-header {
+							flex-direction: column;
+							margin-bottom: 25px;
+
+							&-title {
+								text-align: center;
+								margin: 10px 0 25px;
+							}
+						}
+
+						&-description {
+							width: 100%;
+							margin-bottom: 25px;
 						}
 					}
 				}
 
-				&-track {
+				&-tracks {
+					margin-bottom: 35px;
 					&-info {
-						&.album, &.length {
-							display: none;
+						&-type {
+							&.album, &.length {
+								display: none;
+							}
+						}
+					}
+
+					&-track {
+						&-info {
+							&.album, &.length {
+								display: none;
+							}
 						}
 					}
 				}
@@ -50,7 +57,6 @@
 
 @media screen and (max-width: 430px) {
 	.wrapper {
-		padding-bottom: 45px;
 
 		> .sidebar {
 			display: none;
