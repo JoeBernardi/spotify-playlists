@@ -14,7 +14,7 @@ interface PlaylistObject {
 interface PlaylistProps {
 	path: string;
 	activeTrackId: string;
-	setActiveTrack: () => void;
+	setActiveTrack: (trackId: string) => void;
 	playlistsById: PlaylistObject;
 	sortedPlaylistIds: string[];
 	activePlaylistId?: string;

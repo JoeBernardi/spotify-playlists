@@ -4,7 +4,8 @@ import { Link } from "preact-router/match";
 import LikesSong from "../img/likes_song.jpg";
 
 interface AboutProps {
-	totalTrackLength: string;
+	path?: string;
+	totalTrackLength: number;
 	totalTrackCount: number;
 }
 

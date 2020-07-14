@@ -86,6 +86,7 @@ const appRouter = (props: AppProps) => {
 							<Nav
 								path="/nav"
 								activeTrackId={props.activeTrackId}
+								setActiveTrack={props.setActiveTrack}
 								sortedPlaylistIds={props.sortedPlaylistIds}
 								playlistsById={props.playlistsById}
 								tracksById={props.tracksById}

@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { Track } from "../../shared/interfaces";
 
 interface PlayerProps {
@@ -9,30 +9,34 @@ interface PlayerProps {
 const Player = ({ track, setActiveTrack }: PlayerProps) => {
 	const [volume, setVolume] = useState(1);
 	const fadeoutStart = 25000;
-	let fadeoutTimeout: any;
 
-	const playSong = () => {
+	useEffect(() => {
+		if (!track) {
+			return;
+		}
+
+		let fadeoutInterval: any;
 		setVolume(1);
 
-		fadeoutTimeout = setTimeout(() => {
+		const fadeoutTimeout = setTimeout(() => {
 			let newVolume = volume;
 
-			const fadeoutInterval: any = setInterval(() => {
+			fadeoutInterval = setInterval(() => {
 				newVolume = newVolume - .05;
 				if (newVolume <= 0) {
+					setVolume(0);
 					return clearInterval(fadeoutInterval);
 				}
 
 				setVolume(newVolume);
 			}, fadeoutStart / 100 );
 		}, fadeoutStart);
-	};
 
-	const pauseSong = () => {
-		if (fadeoutTimeout) {
+		return () => {
 			clearTimeout(fadeoutTimeout);
-		}
-	};
+			clearInterval(fadeoutInterval);
+		};
+	}, [track]);
 
 	const endSong = () => {
 		setActiveTrack("");
@@ -44,8 +48,6 @@ const Player = ({ track, setActiveTrack }: PlayerProps) => {
 				volume={volume}
 				src={track.preview_url}
 				autoPlay
-				onPlay={() => playSong()}
-				onPause={() => pauseSong()}
 				onEnded={() => endSong()}
 			/>
 		</div>
