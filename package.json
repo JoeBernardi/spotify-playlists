@@ -33,14 +33,14 @@
     "preact": "^10.0.5",
     "preact-async-route": "^2.2.1",
     "preact-router": "^3.1.0",
-    "spotify-web-api-node": "^4.0.0",
+    "spotify-web-api-node": "5.0.0",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2",
     "unistore": "^3.5.1",
     "webfontloader": "^1.6.28"
   },
   "engines": {
-    "node": "10.16.3"
+    "node": ">10.16.3"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
