@@ -29,9 +29,11 @@ export const actions = () => ({
 			return byId;
 		}, {});
 
-		const totalTrackLength = millisecondsToReadableTime(allTracks.reduce((acc: number, track: Track) => {
+		const totalTrackLengthMs = allTracks.reduce((acc: number, track: Track) => {
 			return acc + track.length.total_ms;
-		}, 0), true);
+		}, 0)
+
+		const totalTrackLength =  millisecondsToReadableTime(totalTrackLengthMs, true)
 
 		return {
 			...state,

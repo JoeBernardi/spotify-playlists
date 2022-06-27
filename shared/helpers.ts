@@ -1,16 +1,20 @@
+const pad = (n:number) => n < 10 ? `0${n}` : n;
+
 export const millisecondsToReadableTime = (timeInMilliseconds: number, sentence: boolean = false): string => {
-	const nearestDurationSecond = 1000 * Math.round(timeInMilliseconds / 1000);
-	const durationDate = new Date(nearestDurationSecond);
-	const durationHours = durationDate.getUTCHours();
-	const durationMinutes = durationDate.getUTCMinutes();
-	const durationSeconds = durationDate.getUTCSeconds();
-	const readableSeconds = (durationSeconds < 10 ? "0" : "") + durationSeconds;
+	const convertSeconds = 1000;
+	const convertMinutes = 60 * convertSeconds;
+    const convertHours = 60 * convertMinutes;
+    const convertDays = 24 * convertHours;
+    const days = Math.floor(timeInMilliseconds / convertDays);
+    const hours = Math.floor((timeInMilliseconds - days * convertDays) / convertHours);
+    const minutes = Math.round((timeInMilliseconds - days * convertDays - hours * convertHours) / convertMinutes);
+    const seconds = Math.floor((timeInMilliseconds % convertMinutes) / 1000)
 
 	if (sentence) {
-		return (durationHours ? `${durationHours} hours, ` : "" ) + `${durationMinutes} minutes, and ${readableSeconds} seconds`;
+		return `${days} days, ` + (hours ? `${hours} hours, ` : "" ) + `${minutes} minutes, and ${seconds} seconds`;
 	}
 
-	return (durationHours ? `${durationHours}:` : "" ) + `${durationMinutes}:${readableSeconds}`;
+	return (hours ? `${pad(hours)}:` : "" ) + `${pad(minutes)}:${pad(seconds)}`;
 };
 
 export default {
