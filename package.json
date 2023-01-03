@@ -20,7 +20,7 @@
     "@types/spotify-web-api-node": "^4.0.1",
     "bent": "^7.0.2",
     "dotenv": "^8.2.0",
-    "ejs": "^2.7.4",
+    "ejs": "^3.1.7",
     "eslint": "^6.7.1",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-airbnb-base": "^14.0.0",
