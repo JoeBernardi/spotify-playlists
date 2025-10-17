@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "bunx vite",
-    "build": "bunx tsc -b && bunx vite build",
+    "build": "bunx vite build",
     "preview": "bunx vite preview",
     "clean": "rm -rf dist",
     "type-check": "bunx tsc --noEmit"

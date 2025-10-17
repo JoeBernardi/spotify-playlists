@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import webfontDownload from "vite-plugin-webfont-dl";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import svgr from "vite-plugin-svgr";
 
@@ -11,17 +10,8 @@ export default defineConfig({
       target: "react",
       autoCodeSplitting: true,
     }),
-    react({
-      babel: {
-        plugins: [["babel-plugin-react-compiler"]],
-      },
-    }),
-    svgr({
-      svgrOptions: {
-        exportType: "default",
-      },
-    }),
-    webfontDownload(),
+    react(),
+    svgr(),
   ],
   server: {
     port: 5173,

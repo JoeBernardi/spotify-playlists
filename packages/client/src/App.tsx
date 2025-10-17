@@ -17,14 +17,7 @@ interface AppProps {
   activePlaylistId?: string;
 }
 
-const App = ({
-  getPlaylists,
-  sortedPlaylistIds,
-  playlistsById,
-  activeTrackId,
-  tracksById,
-  setActiveTrack,
-}: AppProps) => {
+const App = ({ getPlaylists, sortedPlaylistIds }: AppProps) => {
   useEffect(() => {
     getPlaylists();
   }, []);
@@ -33,13 +26,7 @@ const App = ({
     <div>
       {isLoaded && (
         <section className="wrapper">
-          <Nav
-            sortedPlaylistIds={sortedPlaylistIds}
-            playlistsById={playlistsById}
-            activeTrackId={activeTrackId}
-            tracksById={tracksById}
-            setActiveTrack={setActiveTrack}
-          />
+          <Nav />
 
           <MobileFooter />
         </section>
