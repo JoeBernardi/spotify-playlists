@@ -1,0 +1,29 @@
+{
+  "name": "spotify-playlists-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter='!@spotify-playlists/shared' dev",
+    "dev:server": "bun run --filter @spotify-playlists/server dev",
+    "dev:client": "bun run --filter @spotify-playlists/client dev",
+    "build": "bun run --recursive build",
+    "build:server": "bun run --filter @spotify-playlists/server build",
+    "build:client": "bun run --filter @spotify-playlists/client build",
+    "lint": "bun run --recursive lint",
+    "clean": "bun run --recursive clean && rm -rf node_modules",
+    "type-check": "bun run --recursive type-check"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "typescript": "~5.9.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
+  "packageManager": "bun@1.0.0"
+}

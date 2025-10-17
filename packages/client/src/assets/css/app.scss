@@ -1,0 +1,51 @@
+body, html {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+}
+
+.wrapper {
+	display: flex;
+
+	.sidebar {
+		padding: 15px 25px;
+		background: $dark;
+		width: 16%;
+		min-width: 130px;
+		height: calc(100vh - 30px);
+		min-height: 500px;
+		border-right: 1px solid $accent;
+		display: flex;
+		flex-direction: column;	
+
+		header {
+			margin-bottom: 15px;
+
+			.hero {
+				text-decoration: none;
+				font-size: 38px;
+				letter-spacing: 0.025em;
+				text-shadow: 2px 2px $accent;
+				margin-top: 0;
+				color: $light;	
+				font-family: $sans;
+				font-weight: 800;
+				display: block;
+			}
+		}
+	}
+
+	.content {
+		flex: 1;
+		padding: 15px 25px;
+		max-height: calc(100vh - 30px);
+		min-height: 500px;
+		overflow: auto;
+		background: $dark-alternate;
+	}
+
+	.mobile-footer {
+		display: none;
+	}
+}
+

@@ -1,0 +1,106 @@
+.wrapper .sidebar {
+	nav {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		height: 300px;
+
+		.nav-playlists {
+			flex-grow: 2;
+
+			&-year {
+				margin-bottom: 16px;
+
+				&-header {
+					color: $accent;
+					font-family: $sans;
+					font-size: 24px;
+					margin: 0 0 8px;
+					border-bottom: 1px solid $accent;
+					cursor: pointer;
+					display: flex;
+					justify-content: space-between;
+
+					&-title {
+						margin: 0;
+					}
+
+					&-icon {
+						transform: scale(0.7);
+						align-self: center;
+					}
+
+					&:hover {
+						.nav-playlists-year-header-icon {
+							color: $gray;
+						}
+					}
+				}
+
+				&-playlists {
+					transition: max-height 0.2s ease-out;
+					max-height: 0;
+					overflow: hidden;
+
+					.nav-item {
+						font-family: $mono;
+						text-decoration: none;
+						color: $light;
+						letter-spacing: 0.025em;
+						font-size: 14px;
+						line-height: 20px;
+						display: block;
+						margin-bottom: 6px;
+
+						&.active {
+							color: $accent;
+						}
+
+						&:hover {
+							color: $gray;
+						}
+					}
+				}
+
+				&.active {
+					.nav-playlists-year-playlists {
+						max-height: 320px;
+					}
+				}
+			}
+		}
+
+		.nav-player {
+			flex: 0 1;
+
+			&-image {
+				max-height: 200px;
+
+				img {	
+					width: 200px;
+					height: 200px;
+					object-fit: cover;
+				}
+			}
+		}
+
+		.nav-meta {
+			flex: 0 1;
+
+			&-title {
+				color: $accent;
+				font-family: $sans;
+				font-size: 22px;
+				border-bottom: 1px solid $accent;
+				text-decoration: none;
+				font-weight: 800;
+				width: 100%;
+				display: block;
+
+				&:hover {
+					color: $gray;
+				}
+			}
+		}
+	}
+}

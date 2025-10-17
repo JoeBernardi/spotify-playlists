@@ -1,0 +1,7 @@
+[install]
+# Bun workspace configuration
+workspaces = ["packages/*"]
+
+[install.overrides]
+# Override vite to use rolldown-vite
+"vite" = "npm:rolldown-vite@7.1.14"
