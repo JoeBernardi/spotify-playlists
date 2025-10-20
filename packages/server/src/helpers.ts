@@ -121,11 +121,27 @@ export const authAndFetchPlaylists = async (): Promise<Playlist[] | Error> => {
     return cachedPlaylists;
   }
 
-  const apiInstance = SpotifyApi.withClientCredentials(
-    process.env.SPOTIFY_CLIENT_ID as string,
-    process.env.SPOTIFY_SECRET as string,
-    ["user-read-private", "user-read-email", "playlist-read-private"]
-  );
+  const clientId = process.env.SPOTIFY_CLIENT_ID;
+  const clientSecret = process.env.SPOTIFY_SECRET;
+  const username = process.env.SPOTIFY_USER;
+
+  if (!clientId || !clientSecret) {
+    return Promise.reject(
+      new Error(
+        "Missing Spotify credentials: SPOTIFY_CLIENT_ID and/or SPOTIFY_SECRET"
+      )
+    );
+  }
+
+  if (!username) {
+    return Promise.reject(new Error("Missing SPOTIFY_USER"));
+  }
+
+  const apiInstance = SpotifyApi.withClientCredentials(clientId, clientSecret, [
+    "user-read-private",
+    "user-read-email",
+    "playlist-read-private",
+  ]);
 
   return getPlaylists(apiInstance)
     .then((playlists) => {
@@ -133,7 +149,7 @@ export const authAndFetchPlaylists = async (): Promise<Playlist[] | Error> => {
       playlistCache.set(cacheKey, normalizedPlaylists);
       return Promise.resolve(normalizedPlaylists);
     })
-    .catch((e: Error) => e);
+    .catch((e: Error) => Promise.reject(e));
 };
 
 export default {

@@ -3,7 +3,7 @@ FROM oven/bun:1 as base
 WORKDIR /app
 
 # Copy package files first for better caching
-COPY package.json bun.lockb* ./
+COPY package.json bun.lock ./
 COPY packages/server/package.json ./packages/server/
 COPY packages/client/package.json ./packages/client/
 COPY packages/shared/package.json ./packages/shared/
@@ -21,21 +21,24 @@ RUN bun run build
 FROM oven/bun:1-alpine as production
 WORKDIR /app
 
-# Copy package files
-COPY package.json bun.lockb* ./
+# Copy package files for workspace install (runtime deps only)
+COPY package.json bun.lock ./
 COPY packages/server/package.json ./packages/server/
 COPY packages/client/package.json ./packages/client/
 COPY packages/shared/package.json ./packages/shared/
 
-# Install all dependencies (needed for client build)
-RUN bun install --frozen-lockfile
+# Install only production dependencies for all workspaces
+RUN bun install --frozen-lockfile --production
 
 # Copy built application from base stage
 COPY --from=base /app/packages/server/dist ./packages/server/dist
 COPY --from=base /app/packages/client/dist ./packages/client/dist
 
+# Use the server package as the working directory so static paths resolve
+WORKDIR /app/packages/server
+
 # Expose port
 EXPOSE 3000
 
 # Start the server
-CMD ["bun", "run", "packages/server/dist/index.js"]
+CMD ["bun", "dist/index.js"]

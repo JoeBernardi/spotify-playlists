@@ -25,6 +25,21 @@ async function main() {
   await registerApiRoutes(fastify);
   await registerAdminRoutes(fastify);
 
+  // Diagnostics: verify client dist registration/visibility
+  fastify.get("/__static-check", async (_req, reply) => {
+    try {
+      const cwd = process.cwd();
+      const nodeEnv = process.env.NODE_ENV || "development";
+      return reply.send({ ok: true, cwd, nodeEnv });
+    } catch (e) {
+      return reply
+        .status(500)
+        .send({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  // Fallback now handled in registerStaticRoutes
+
   await fastify.listen({ port, host: "0.0.0.0" });
   const address = fastify.server.address();
 
