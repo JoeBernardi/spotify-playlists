@@ -118,9 +118,11 @@ export const authAndFetchPlaylists = async (): Promise<Playlist[] | Error> => {
   const cachedPlaylists: Playlist[] | undefined = playlistCache.get(cacheKey);
 
   if (cachedPlaylists) {
+    console.log("Cached playlists found");
     return cachedPlaylists;
   }
 
+  console.log("No cached playlists found");
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_SECRET;
   const username = process.env.SPOTIFY_USER;

@@ -1,12 +1,5 @@
-/* Import all SCSS files from assets/css */
-@import './assets/css/vars.scss';
+/* Import aggregated styles */
 @import './assets/css/main.scss';
-@import './assets/css/app.scss';
-@import './assets/css/nav.scss';
-@import './assets/css/playlist.scss';
-@import './assets/css/about.scss';
-@import './assets/css/mobile.scss';
-@import './assets/css/spinner.scss';
 
 /* Playlist Tracks Styles */
 .playlist-tracks-track-info.preview-icon button {

@@ -43,6 +43,7 @@ const Nav = () => {
       <nav>
         {years.map((year) => (
           <NavYear
+            key={year}
             year={year}
             playlists={playlistsByYear[year]}
             isActive={year === activeYear}

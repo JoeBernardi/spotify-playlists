@@ -5,36 +5,23 @@ import Nav from "../components/Nav";
 import MobileFooter from "../components/MobileFooter";
 import { useFetchPlaylists } from "../utils/hooks";
 import Loader from "../components/Loader";
-import { useAtomValue } from "jotai";
-import { errorAtom, isLoadingAtom } from "../utils/store";
 
 export const Route = createRootRoute({
   component: () => {
     const isDevelopment = import.meta.env.DEV;
     useFetchPlaylists();
-    const isLoading = useAtomValue(isLoadingAtom);
-    const error = useAtomValue(errorAtom);
 
     return (
-      <div className="wrapper">
-        <Nav />
-        <div className="content">
-          {isLoading && <Loader />}
-          {!isLoading && !error && (
-            <Suspense fallback={<Loader />}>
-              <Outlet />
-            </Suspense>
-          )}
-          {!isLoading && error && (
-            <div style={{ padding: 16 }}>
-              <p>Failed to load playlists.</p>
-              <pre>{error}</pre>
-            </div>
-          )}
+      <Suspense fallback={<Loader />}>
+        <div className="wrapper">
+          <Nav />
+          <div className="content">
+            <Outlet />
+          </div>
+          <MobileFooter />
+          {isDevelopment && <TanStackRouterDevtools />}
         </div>
-        <MobileFooter />
-        {isDevelopment && <TanStackRouterDevtools />}
-      </div>
+      </Suspense>
     );
   },
 });
