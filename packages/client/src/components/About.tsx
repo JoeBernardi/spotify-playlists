@@ -52,9 +52,8 @@ const About = () => {
         myself? I don't know. After about a year and a half of making them,
         though, I began to second-guess whether I'd already used a given song.
         Spotify doesn't make it easy to search all your playlists at once, so I
-        made this thing as an un-branded way to catalog everything. There's an
-        undocumented page <Link href="/everything">here</Link> that just lists
-        all the songs.
+        made this thing as an un-branded way to catalog everything. There's a
+        page <Link href="/everything">here</Link> that just lists all the songs.
       </p>
 
       <p>

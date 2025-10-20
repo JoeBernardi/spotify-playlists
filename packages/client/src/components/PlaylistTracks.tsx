@@ -7,9 +7,10 @@ import { activeTrackIdAtom } from "../utils/store";
 
 interface PlaylistTracksProps {
   tracks: Track[];
+  showDates?: boolean;
 }
 
-const PlaylistTracks = ({ tracks }: PlaylistTracksProps) => {
+const PlaylistTracks = ({ tracks, showDates = false }: PlaylistTracksProps) => {
   const [activeTrackId, setActiveTrack] = useAtom(activeTrackIdAtom);
   return (
     <table className="playlist-tracks">
@@ -30,6 +31,11 @@ const PlaylistTracks = ({ tracks }: PlaylistTracksProps) => {
           <th className="playlist-tracks-info-type length icon" scope="col">
             <ClockIcon />
           </th>
+          {showDates && (
+            <th className="playlist-tracks-info-type date" scope="col">
+              Playlist
+            </th>
+          )}
         </tr>
       </thead>
       <tbody>
@@ -83,6 +89,11 @@ const PlaylistTracks = ({ tracks }: PlaylistTracksProps) => {
               <td className="playlist-tracks-track-info length">
                 {track.length.readable_length}
               </td>
+              {showDates && (
+                <td className="playlist-tracks-track-info date">
+                  {track.date}
+                </td>
+              )}
             </tr>
           );
         })}

@@ -7,7 +7,7 @@ import {
   Track,
 } from "@spotify-playlists/shared";
 
-import { cacheKey, cacheTTLInSeconds, months } from "./consts";
+import { cacheKey, cacheTTLInSeconds, MONTH_TO_NUMBER, months } from "./consts";
 import {
   SpotifyApi,
   Playlist as SpotifyPlaylist,
@@ -59,7 +59,8 @@ const getPlaylists = async (spotifyAPI: SpotifyApi) => {
 };
 
 const normalizeTracks = (
-  tracksFromApi: PlaylistedTrack<SpotifyTrack>[]
+  tracksFromApi: PlaylistedTrack<SpotifyTrack>[],
+  playlistDate: string
 ): Track[] => {
   return tracksFromApi.map(({ track }) => {
     const { name, duration_ms, id, album, external_urls, preview_url } = track;
@@ -80,6 +81,7 @@ const normalizeTracks = (
       url: external_urls.spotify,
       image: album.images[1].url,
       artist: artists,
+      date: playlistDate,
       length: {
         total_ms: duration_ms,
         readable_length: millisecondsToReadableTime(duration_ms),
@@ -107,7 +109,8 @@ const normalizePlaylists = (
         month: playlist.name.split(" ")[0],
         year: playlist.name.split(" ")[1],
         tracks: normalizeTracks(
-          playlist.tracks.items as PlaylistedTrack<SpotifyTrack>[]
+          playlist.tracks.items as PlaylistedTrack<SpotifyTrack>[],
+          playlistNameToAbbreviatedDate(playlist.name)
         ),
       };
     })
@@ -152,6 +155,12 @@ export const authAndFetchPlaylists = async (): Promise<Playlist[] | Error> => {
       return Promise.resolve(normalizedPlaylists);
     })
     .catch((e: Error) => Promise.reject(e));
+};
+
+const playlistNameToAbbreviatedDate = (playlistName: string) => {
+  const [month, year] = playlistName.split(" ");
+  const lastTwoDigitsOfYear = year.slice(-2);
+  return `${MONTH_TO_NUMBER[month]}/${lastTwoDigitsOfYear}`;
 };
 
 export default {

@@ -10,6 +10,7 @@ export interface Track {
   title: string;
   id: string;
   url: string;
+  date: string;
 }
 
 export interface Artist {
