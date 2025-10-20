@@ -2,19 +2,15 @@ import type { Track } from "@spotify-playlists/shared";
 import ClockIcon from "../assets/img/icons/clock.svg?react";
 import PauseIcon from "../assets/img/icons/pause.svg?react";
 import PlayIcon from "../assets/img/icons/play.svg?react";
+import { useAtom } from "jotai";
+import { activeTrackIdAtom } from "../utils/store";
 
 interface PlaylistTracksProps {
-  path?: string;
-  activeTrackId: string;
-  setActiveTrack: (trackUrl: string) => void;
   tracks: Track[];
 }
 
-const PlaylistTracks = ({
-  tracks,
-  setActiveTrack,
-  activeTrackId,
-}: PlaylistTracksProps) => {
+const PlaylistTracks = ({ tracks }: PlaylistTracksProps) => {
+  const [activeTrackId, setActiveTrack] = useAtom(activeTrackIdAtom);
   return (
     <table className="playlist-tracks">
       <thead className="playlist-tracks-info">

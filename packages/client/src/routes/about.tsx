@@ -1,29 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 import About from "../components/About";
 import type { Playlist } from "@spotify-playlists/shared";
 import { fetchPlaylists } from "../utils/api";
 
 export const Route = createFileRoute("/about")({
+  loader: async () => {
+    const playlists: Playlist[] = await fetchPlaylists();
+    const allTracks = playlists.flatMap((playlist) => playlist.tracks || []);
+    return {
+      totalTrackLength: allTracks.length,
+      totalTrackCount: allTracks.length,
+    };
+  },
   component: () => {
-    const [totalTrackLength, setTotalTrackLength] = useState(0);
-    const [totalTrackCount, setTotalTrackCount] = useState(0);
-
-    useEffect(() => {
-      const fetchStats = async () => {
-        try {
-          const playlists: Playlist[] = await fetchPlaylists();
-          const allTracks = playlists.flatMap(
-            (playlist) => playlist.tracks || []
-          );
-          setTotalTrackLength(allTracks.length);
-          setTotalTrackCount(allTracks.length);
-        } catch (error) {
-          console.error("Failed to fetch playlist stats:", error);
-        }
-      };
-      fetchStats();
-    }, []);
+    const { totalTrackLength, totalTrackCount } = useLoaderData({
+      from: "/about",
+    });
 
     return (
       <About
