@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy } from "react";
-
-// Lazy load the component to avoid import issues
-const PlaylistComponent = lazy(() => import("../components/Playlist"));
+import Playlist from "../components/Playlist";
+import { useParams } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/playlist/$id")({
-  component: PlaylistComponent,
+  component: () => {
+    const { id } = useParams({ from: "/playlist/$id" });
+    return <Playlist id={id} />;
+  },
 });
