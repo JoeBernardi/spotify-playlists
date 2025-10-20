@@ -1,4 +1,4 @@
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { createRootRoute, Outlet, useLoaderData } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import Nav from "../components/Nav";
 import MobileFooter from "../components/MobileFooter";
@@ -9,6 +9,7 @@ import { errorAtom, isLoadingAtom } from "../utils/store";
 
 export const Route = createRootRoute({
   component: () => {
+    const isDevelopment = import.meta.env.DEV;
     useFetchPlaylists();
     const isLoading = useAtomValue(isLoadingAtom);
     const error = useAtomValue(errorAtom);
@@ -26,7 +27,7 @@ export const Route = createRootRoute({
           )}
         </div>
         <MobileFooter />
-        <TanStackRouterDevtools />
+        {isDevelopment && <TanStackRouterDevtools />}
       </div>
     );
   },
