@@ -5,11 +5,18 @@ import Nav from "../components/Nav";
 import MobileFooter from "../components/MobileFooter";
 import { useFetchPlaylists } from "../utils/hooks";
 import Loader from "../components/Loader";
+import { useAtomValue } from "jotai";
+import { isLoadingAtom } from "../utils/store";
 
 export const Route = createRootRoute({
   component: () => {
     const isDevelopment = import.meta.env.DEV;
     useFetchPlaylists();
+    const isLoading = useAtomValue(isLoadingAtom);
+
+    if (isLoading) {
+      return <Loader />;
+    }
 
     return (
       <Suspense fallback={<Loader />}>
