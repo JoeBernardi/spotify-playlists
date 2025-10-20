@@ -14,3 +14,6 @@ export const tracksAtom: Atom<Track[]> = atom((get) => {
 });
 
 export const activeTrackIdAtom = atom<string>("");
+
+export const isLoadingAtom = atom<boolean>(true);
+export const errorAtom = atom<string | null>(null);

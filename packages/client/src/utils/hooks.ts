@@ -1,18 +1,31 @@
 import { useEffect, useMemo } from "react";
 import { useSetAtom, useAtomValue } from "jotai";
 import { fetchPlaylists } from "./api";
-import { setPlaylistsAtom, playlistsAtom, tracksAtom } from "./store";
+import {
+  setPlaylistsAtom,
+  playlistsAtom,
+  tracksAtom,
+  isLoadingAtom,
+  errorAtom,
+} from "./store";
 import { useParams } from "@tanstack/react-router";
 
 export const useFetchPlaylists = () => {
   const setPlaylists = useSetAtom(setPlaylistsAtom);
+  const setIsLoading = useSetAtom(isLoadingAtom);
+  const setError = useSetAtom(errorAtom);
   useEffect(() => {
     const fetchPlaylistsData = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
         const data = await fetchPlaylists();
         setPlaylists(data);
+        setIsLoading(false);
       } catch (error) {
         console.error("Failed to fetch playlists:", error);
+        setError(error instanceof Error ? error.message : String(error));
+        setIsLoading(false);
       }
     };
     fetchPlaylistsData();
