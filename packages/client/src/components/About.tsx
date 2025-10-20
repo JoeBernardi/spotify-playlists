@@ -1,13 +1,15 @@
 import LikesSong from "../assets/img/likes_song.jpg";
 import Link from "./Link";
+import { useTracks } from "../utils/hooks";
 
-interface AboutProps {
-  path?: string;
-  totalTrackLength: number;
-  totalTrackCount: number;
-}
+const About = () => {
+  const tracks = useTracks();
+  const totalTrackLength = tracks.reduce(
+    (acc, track) => acc + track.length.total_ms,
+    0
+  );
+  const totalTrackCount = tracks.length;
 
-const About = ({ totalTrackLength, totalTrackCount }: AboutProps) => {
   return (
     <section className="copy">
       <figure>

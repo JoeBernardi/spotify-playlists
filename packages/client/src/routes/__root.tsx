@@ -1,4 +1,5 @@
-import { createRootRoute, Outlet, useLoaderData } from "@tanstack/react-router";
+import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { Suspense } from "react";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import Nav from "../components/Nav";
 import MobileFooter from "../components/MobileFooter";
@@ -13,12 +14,17 @@ export const Route = createRootRoute({
     useFetchPlaylists();
     const isLoading = useAtomValue(isLoadingAtom);
     const error = useAtomValue(errorAtom);
+
     return (
       <div className="wrapper">
         <Nav />
         <div className="content">
           {isLoading && <Loader />}
-          {!isLoading && !error && <Outlet />}
+          {!isLoading && !error && (
+            <Suspense fallback={<Loader />}>
+              <Outlet />
+            </Suspense>
+          )}
           {!isLoading && error && (
             <div style={{ padding: 16 }}>
               <p>Failed to load playlists.</p>

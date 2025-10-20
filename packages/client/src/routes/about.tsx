@@ -1,27 +1,9 @@
-import { createFileRoute, useLoaderData } from "@tanstack/react-router";
-import About from "../components/About";
-import type { Playlist } from "@spotify-playlists/shared";
-import { fetchPlaylists } from "../utils/api";
+import { createFileRoute } from "@tanstack/react-router";
+import { lazy } from "react";
+
+// Lazy load the component to avoid import issues
+const AboutComponent = lazy(() => import("../components/About"));
 
 export const Route = createFileRoute("/about")({
-  loader: async () => {
-    const playlists: Playlist[] = await fetchPlaylists();
-    const allTracks = playlists.flatMap((playlist) => playlist.tracks || []);
-    return {
-      totalTrackLength: allTracks.length,
-      totalTrackCount: allTracks.length,
-    };
-  },
-  component: () => {
-    const { totalTrackLength, totalTrackCount } = useLoaderData({
-      from: "/about",
-    });
-
-    return (
-      <About
-        totalTrackLength={totalTrackLength}
-        totalTrackCount={totalTrackCount}
-      />
-    );
-  },
+  component: AboutComponent,
 });

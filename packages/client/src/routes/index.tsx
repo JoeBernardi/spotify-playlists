@@ -1,17 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Playlist from "../components/Playlist";
-import { fetchPlaylists } from "../utils/api";
-import { useLoaderData } from "@tanstack/react-router";
+import { usePlaylists } from "../utils/hooks";
 
 export const Route = createFileRoute("/")({
-  loader: async () => {
-    const playlists = await fetchPlaylists();
-    return {
-      playlists,
-    };
-  },
   component: () => {
-    const { playlists } = useLoaderData({ from: "/" });
+    const playlists = usePlaylists();
 
     if (!playlists.length) {
       return null;

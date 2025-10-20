@@ -1,17 +1,10 @@
-import { createFileRoute, useLoaderData } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import PlaylistTracks from "../components/PlaylistTracks";
-import { fetchPlaylists } from "../utils/api";
+import { useTracks } from "../utils/hooks";
 
 export const Route = createFileRoute("/everything")({
-  loader: async () => {
-    const data = await fetchPlaylists();
-    const tracks = data.flatMap((playlist) => playlist.tracks || []);
-    return {
-      tracks,
-    };
-  },
   component: () => {
-    const { tracks } = useLoaderData({ from: "/everything" });
+    const tracks = useTracks();
     return <PlaylistTracks tracks={tracks} />;
   },
 });

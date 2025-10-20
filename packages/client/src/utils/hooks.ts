@@ -14,8 +14,15 @@ export const useFetchPlaylists = () => {
   const setPlaylists = useSetAtom(setPlaylistsAtom);
   const setIsLoading = useSetAtom(isLoadingAtom);
   const setError = useSetAtom(errorAtom);
+  const playlists = useAtomValue(playlistsAtom);
   useEffect(() => {
     const fetchPlaylistsData = async () => {
+      // If we already have playlists in the atom, skip refetching
+      if (playlists && playlists.length > 0) {
+        setIsLoading(false);
+        return;
+      }
+
       setIsLoading(true);
       setError(null);
       try {
@@ -29,7 +36,7 @@ export const useFetchPlaylists = () => {
       }
     };
     fetchPlaylistsData();
-  }, [setPlaylists]);
+  }, [setPlaylists, setIsLoading, setError, playlists]);
 };
 
 export const usePlaylists = () => {

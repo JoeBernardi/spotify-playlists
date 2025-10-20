@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as NavRouteImport } from './routes/nav'
 import { Route as EverythingRouteImport } from './routes/everything'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlaylistIdRouteImport } from './routes/playlist.$id'
 
+const NavRoute = NavRouteImport.update({
+  id: '/nav',
+  path: '/nav',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EverythingRoute = EverythingRouteImport.update({
   id: '/everything',
   path: '/everything',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/everything': typeof EverythingRoute
+  '/nav': typeof NavRoute
   '/playlist/$id': typeof PlaylistIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/everything': typeof EverythingRoute
+  '/nav': typeof NavRoute
   '/playlist/$id': typeof PlaylistIdRoute
 }
 export interface FileRoutesById {
@@ -52,25 +60,34 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/everything': typeof EverythingRoute
+  '/nav': typeof NavRoute
   '/playlist/$id': typeof PlaylistIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/everything' | '/playlist/$id'
+  fullPaths: '/' | '/about' | '/everything' | '/nav' | '/playlist/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/everything' | '/playlist/$id'
-  id: '__root__' | '/' | '/about' | '/everything' | '/playlist/$id'
+  to: '/' | '/about' | '/everything' | '/nav' | '/playlist/$id'
+  id: '__root__' | '/' | '/about' | '/everything' | '/nav' | '/playlist/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   EverythingRoute: typeof EverythingRoute
+  NavRoute: typeof NavRoute
   PlaylistIdRoute: typeof PlaylistIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/nav': {
+      id: '/nav'
+      path: '/nav'
+      fullPath: '/nav'
+      preLoaderRoute: typeof NavRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/everything': {
       id: '/everything'
       path: '/everything'
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   EverythingRoute: EverythingRoute,
+  NavRoute: NavRoute,
   PlaylistIdRoute: PlaylistIdRoute,
 }
 export const routeTree = rootRouteImport
