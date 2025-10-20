@@ -58,10 +58,15 @@ const getPlaylists = async (spotifyAPI: SpotifyApi) => {
   return await getPlaylistsFromServer().catch((e: Error) => Promise.reject(e));
 };
 
-const normalizeTracks = (
-  tracksFromApi: PlaylistedTrack<SpotifyTrack>[],
-  playlistDate: string
-): Track[] => {
+const normalizeTracks = ({
+  tracksFromApi,
+  playlistDate,
+  playlistUrl,
+}: {
+  tracksFromApi: PlaylistedTrack<SpotifyTrack>[];
+  playlistDate: string;
+  playlistUrl: string;
+}): Track[] => {
   return tracksFromApi.map(({ track }) => {
     const { name, duration_ms, id, album, external_urls, preview_url } = track;
 
@@ -87,6 +92,7 @@ const normalizeTracks = (
         readable_length: millisecondsToReadableTime(duration_ms),
       },
       album: trackAlbum,
+      playlistUrl,
       preview_url,
       id,
       title: name,
@@ -108,10 +114,12 @@ const normalizePlaylists = (
         title: playlist.name,
         month: playlist.name.split(" ")[0],
         year: playlist.name.split(" ")[1],
-        tracks: normalizeTracks(
-          playlist.tracks.items as PlaylistedTrack<SpotifyTrack>[],
-          playlistNameToAbbreviatedDate(playlist.name)
-        ),
+        tracks: normalizeTracks({
+          tracksFromApi: playlist.tracks
+            .items as PlaylistedTrack<SpotifyTrack>[],
+          playlistDate: playlistNameToAbbreviatedDate(playlist.name),
+          playlistUrl: playlist.external_urls.spotify,
+        }),
       };
     })
     .sort((a, b) => (new Date(b.title) > new Date(a.title) ? 1 : -1));

@@ -11,6 +11,7 @@ export interface Track {
   id: string;
   url: string;
   date: string;
+  playlistUrl: string;
 }
 
 export interface Artist {

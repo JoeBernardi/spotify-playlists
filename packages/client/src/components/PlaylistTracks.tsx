@@ -91,7 +91,9 @@ const PlaylistTracks = ({ tracks, showDates = false }: PlaylistTracksProps) => {
               </td>
               {showDates && (
                 <td className="playlist-tracks-track-info date">
-                  {track.date}
+                  <a target="_blank" href={track.playlistUrl}>
+                    {track.date}
+                  </a>
                 </td>
               )}
             </tr>
