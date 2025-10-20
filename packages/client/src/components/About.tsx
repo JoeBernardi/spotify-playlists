@@ -1,6 +1,7 @@
 import LikesSong from "../assets/img/likes_song.jpg";
 import Link from "./Link";
 import { useTracks } from "../utils/hooks";
+import { millisecondsToReadableTime } from "@spotify-playlists/shared";
 
 const About = () => {
   const tracks = useTracks();
@@ -8,6 +9,12 @@ const About = () => {
     (acc, track) => acc + track.length.total_ms,
     0
   );
+
+  const readableTotalTrackLength = millisecondsToReadableTime(
+    totalTrackLength,
+    true
+  );
+
   const totalTrackCount = tracks.length;
 
   return (
@@ -28,7 +35,7 @@ const About = () => {
 
       <p>
         <strong>{totalTrackCount}</strong> tunes totaling{" "}
-        <strong>{totalTrackLength}</strong>.
+        <strong>{readableTotalTrackLength}</strong>.
       </p>
 
       <p>
