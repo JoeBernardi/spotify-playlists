@@ -1,15 +1,17 @@
 import { useNavigate } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 
 import LinkIcon from "../assets/img/icons/link.svg?react";
 import NextIcon from "../assets/img/icons/next.svg?react";
 import PrevIcon from "../assets/img/icons/prev.svg?react";
 
 import PlaylistTracks from "./PlaylistTracks";
+import Lightbox from "./Lightbox";
 import { usePlaylist, usePlaylists, usePlaylistTracks } from "../utils/hooks";
-import { useMemo } from "react";
 
 const Playlist = ({ id }: { id?: string }) => {
   const navigate = useNavigate();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const allPlaylists = usePlaylists();
   const playlist = usePlaylist(id);
   usePlaylistTracks(id);
@@ -44,9 +46,21 @@ const Playlist = ({ id }: { id?: string }) => {
     <section className="playlist">
       <div className="playlist-info">
         {playlist.image && (
-          <div className="playlist-info-image">
+          <button
+            type="button"
+            className="playlist-info-image"
+            onClick={() => setLightboxOpen(true)}
+            aria-label={`View cover art for ${playlist.title}`}
+          >
             <img src={playlist.image} alt={playlist.title} />
-          </div>
+          </button>
+        )}
+        {lightboxOpen && playlist.image && (
+          <Lightbox
+            src={playlist.image}
+            alt={playlist.title}
+            onClose={() => setLightboxOpen(false)}
+          />
         )}
         <div className="playlist-info-text">
           <div className="playlist-info-text-header">
