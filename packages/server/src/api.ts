@@ -1,12 +1,14 @@
 import { FastifyInstance } from "fastify";
-import { authAndFetchPlaylists } from "./helpers.js";
+import { fetchListing, fetchPlaylistTracks } from "./helpers.js";
+import { cacheTTLInSeconds } from "./consts.js";
 
 export const registerApiRoutes = async (fastify: FastifyInstance) => {
-  // API routes
   fastify.get("/playlists", async (_req, reply) => {
     try {
-      const playlists = await authAndFetchPlaylists();
-      return reply.send(playlists);
+      const playlists = await fetchListing();
+      return reply
+        .header("Cache-Control", `public, max-age=${cacheTTLInSeconds}`)
+        .send(playlists);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Unknown error";
       fastify.log.error({ err: e }, "Failed to fetch playlists");
@@ -15,4 +17,28 @@ export const registerApiRoutes = async (fastify: FastifyInstance) => {
         .send({ message: "Failed to fetch playlists", error: message });
     }
   });
+
+  fastify.get<{ Params: { id: string } }>(
+    "/playlists/:id/tracks",
+    async (req, reply) => {
+      try {
+        const tracks = await fetchPlaylistTracks(req.params.id);
+        fastify.log.info(
+          `Sending ${tracks.length} tracks for playlist ${req.params.id}`,
+        );
+        return reply
+          .header("Cache-Control", `public, max-age=${cacheTTLInSeconds}`)
+          .send(tracks);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Unknown error";
+        fastify.log.error(
+          { err: e },
+          `Failed to fetch tracks for playlist ${req.params.id}`,
+        );
+        return reply
+          .status(500)
+          .send({ message: "Failed to fetch tracks", error: message });
+      }
+    },
+  );
 };

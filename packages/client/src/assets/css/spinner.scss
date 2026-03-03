@@ -1,8 +1,17 @@
+@use "vars" as *;
+
 .loader-wrapper {
 	width: 100%;
 	height: 100vh;
 	background: $dark;
 	display: flex;
+
+	&--inline {
+		height: auto;
+		background: transparent;
+		align-items: center;
+		justify-content: center;
+	}
 }
 
 /*!

@@ -1,6 +1,6 @@
-const Loader = () => {
+const Loader = ({ variant }: { variant?: "full" | "inline" }) => {
   return (
-    <div className="loader-wrapper">
+    <div className={`loader-wrapper${variant === "inline" ? " loader-wrapper--inline" : ""}`}>
       <div className="loading-spinner">
         <div />
         <div />

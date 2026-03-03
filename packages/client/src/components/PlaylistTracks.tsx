@@ -11,6 +11,7 @@ interface PlaylistTracksProps {
 }
 
 const PlaylistTracks = ({ tracks, showDates = false }: PlaylistTracksProps) => {
+  console.log(`[PlaylistTracks] Rendering ${tracks.length} tracks`);
   const [activeTrackId, setActiveTrack] = useAtom(activeTrackIdAtom);
   return (
     <table className="playlist-tracks">
@@ -43,7 +44,7 @@ const PlaylistTracks = ({ tracks, showDates = false }: PlaylistTracksProps) => {
           const artists = track.artist
             .map(
               (artist) =>
-                `<a target="_blank" href="${artist.url}">${artist.name}</a>`
+                `<a target="_blank" href="${artist.url}">${artist.name}</a>`,
             )
             .join(", ");
 

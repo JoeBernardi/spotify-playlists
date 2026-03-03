@@ -1,11 +1,13 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSetAtom, useAtomValue } from "jotai";
-import { fetchPlaylists } from "./api";
+import { fetchPlaylists, fetchPlaylistTracks } from "./api";
 import {
   setPlaylistsAtom,
   playlistsAtom,
   tracksAtom,
   isLoadingAtom,
+  loadedTrackIdsAtom,
+  setPlaylistTracksAtom,
 } from "./store";
 import { useParams } from "@tanstack/react-router";
 
@@ -15,7 +17,6 @@ export const useFetchPlaylists = () => {
   const playlists = useAtomValue(playlistsAtom);
   useEffect(() => {
     const fetchPlaylistsData = async () => {
-      // If we already have playlists in the atom, skip refetching
       if (playlists && playlists.length > 0) {
         return;
       }
@@ -50,21 +51,91 @@ export const usePlaylist = (id?: string) => {
   if (id) {
     return useMemo(
       () => playlists.find((playlist) => playlist.id === id),
-      [playlists, id]
+      [playlists, id],
     );
   }
 
-  // Try to get route params only if we're on the playlist route
   let routeId: string | undefined;
   try {
     const params = useParams({ from: "/playlist/$id" });
     routeId = params.id;
   } catch {
-    // Not on playlist route, routeId remains undefined
+    routeId = undefined;
   }
 
   return useMemo(
     () => playlists.find((playlist) => playlist.id === routeId),
-    [playlists, routeId]
+    [playlists, routeId],
   );
+};
+
+export const usePlaylistTracks = (id?: string) => {
+  const setTracks = useSetAtom(setPlaylistTracksAtom);
+  const loadedIds = useAtomValue(loadedTrackIdsAtom);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const isLoaded = id ? loadedIds.has(id) : true;
+
+  useEffect(() => {
+    if (!id || isLoaded) return;
+
+    let cancelled = false;
+    setIsLoading(true);
+
+    fetchPlaylistTracks(id)
+      .then((tracks) => {
+        setTracks({ id, tracks });
+        if (!cancelled) {
+          console.log(`[usePlaylistTracks] Received ${tracks?.length ?? 0} tracks for ${id}`);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) console.error(`Failed to fetch tracks for ${id}:`, err);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, isLoaded, setTracks]);
+
+  return { isLoadingTracks: isLoading && !isLoaded };
+};
+
+export const useAllPlaylistTracks = () => {
+  const playlists = useAtomValue(playlistsAtom);
+  const setTracks = useSetAtom(setPlaylistTracksAtom);
+  const loadedIds = useAtomValue(loadedTrackIdsAtom);
+  const tracks = useAtomValue(tracksAtom);
+  const [isLoading, setIsLoading] = useState(false);
+  const fetchingRef = useRef(false);
+
+  useEffect(() => {
+    if (fetchingRef.current || !playlists.length) return;
+    const unloaded = playlists.filter((p) => !loadedIds.has(p.id));
+    if (!unloaded.length) return;
+
+    fetchingRef.current = true;
+    setIsLoading(true);
+
+    (async () => {
+      for (const playlist of unloaded) {
+        try {
+          const t = await fetchPlaylistTracks(playlist.id);
+          setTracks({ id: playlist.id, tracks: t });
+        } catch (err) {
+          console.error(
+            `Failed to fetch tracks for ${playlist.id}:`,
+            err,
+          );
+        }
+      }
+      setIsLoading(false);
+      fetchingRef.current = false;
+    })();
+  }, [playlists]);
+
+  return { tracks, isLoading };
 };

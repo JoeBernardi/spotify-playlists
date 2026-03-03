@@ -1,7 +1,9 @@
+@use "vars" as *;
 
 @media screen and (max-width: 600px) {
 	.wrapper {
 		.content {
+			min-height: calc(100vh - 100px);
 			.copy {
 				margin: 35px 0 100px;
 			}
@@ -64,6 +66,7 @@
 
 		.content {
 			max-height: calc(100vh - 100px);
+			min-height: calc(100vh - 100px);
 			padding-top: 0;
 			.copy {
 				p {

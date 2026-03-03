@@ -1,5 +1,21 @@
+@use "vars" as *;
+
 .content {
 	.playlist {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+
+		&-loading {
+			flex: 1;
+			min-height: 200px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: $dark-alternate;
+		}
+
 		&-info {
 			display: flex;
 			margin-bottom: 24px;
