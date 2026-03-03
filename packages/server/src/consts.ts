@@ -1,5 +1,5 @@
 export const cacheKey = "playlists";
-export const cacheTTLInSeconds = 14400; // 4 hours
+export const cacheTTLInSeconds = 2592000; // 30 days
 export const months = [
   "January",
   "February",
