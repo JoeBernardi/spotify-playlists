@@ -85,9 +85,6 @@ export const usePlaylistTracks = (id?: string) => {
     fetchPlaylistTracks(id)
       .then((tracks) => {
         setTracks({ id, tracks });
-        if (!cancelled) {
-          console.log(`[usePlaylistTracks] Received ${tracks?.length ?? 0} tracks for ${id}`);
-        }
       })
       .catch((err) => {
         if (!cancelled) console.error(`Failed to fetch tracks for ${id}:`, err);
@@ -120,16 +117,18 @@ export const useAllPlaylistTracks = () => {
     fetchingRef.current = true;
     setIsLoading(true);
 
+    const TRACK_FETCH_DELAY_MS = 150;
     (async () => {
-      for (const playlist of unloaded) {
+      for (let i = 0; i < unloaded.length; i++) {
+        const playlist = unloaded[i];
         try {
           const t = await fetchPlaylistTracks(playlist.id);
           setTracks({ id: playlist.id, tracks: t });
         } catch (err) {
-          console.error(
-            `Failed to fetch tracks for ${playlist.id}:`,
-            err,
-          );
+          console.error(`Failed to fetch tracks for ${playlist.id}:`, err);
+        }
+        if (i < unloaded.length - 1) {
+          await new Promise((r) => setTimeout(r, TRACK_FETCH_DELAY_MS));
         }
       }
       setIsLoading(false);

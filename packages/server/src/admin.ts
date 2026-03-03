@@ -1,5 +1,16 @@
 import { FastifyInstance } from "fastify";
-import { playlistCache } from "./helpers.js";
+import {
+  fetchListing,
+  fetchPlaylistTracks,
+  isPlaylistStable,
+  playlistCache,
+  saveStablePlaylistsToDisk,
+  stablePlaylistsMap,
+  tracksCacheKey,
+} from "./helpers.js";
+import { TRACK_FETCH_DELAY_MS } from "./consts.js";
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function registerAdminRoutes(fastify: FastifyInstance) {
   // Register basic auth for admin endpoints
@@ -43,6 +54,41 @@ export async function registerAdminRoutes(fastify: FastifyInstance) {
     }
   );
 
+  // Admin endpoint to refresh stable playlists from Spotify and overwrite JSON
+  fastify.post(
+    "/admin/cache/refresh-stable",
+    { preHandler: fastify.basicAuth },
+    async (_req, res) => {
+      try {
+        const playlists = await fetchListing();
+        const stable = playlists.filter((p) =>
+          isPlaylistStable(p.month, p.year),
+        );
+        for (const p of stable) {
+          playlistCache.del(tracksCacheKey(p.id));
+          stablePlaylistsMap.delete(p.id);
+        }
+        for (let i = 0; i < stable.length; i++) {
+          await fetchPlaylistTracks(stable[i].id, { skipStableSave: true });
+          if (i < stable.length - 1) await sleep(TRACK_FETCH_DELAY_MS);
+        }
+        await saveStablePlaylistsToDisk();
+        return res.send({
+          success: true,
+          message: `Refreshed ${stable.length} stable playlists from Spotify`,
+          count: stable.length,
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        return res.status(500).send({
+          success: false,
+          message: "Failed to refresh stable playlists",
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    }
+  );
+
   // Admin endpoint to check cache status
   fastify.get(
     "/admin/cache/status",
@@ -55,6 +101,7 @@ export async function registerAdminRoutes(fastify: FastifyInstance) {
           success: true,
           stats,
           keys,
+          stablePlaylistsCount: stablePlaylistsMap.size,
           timestamp: new Date().toISOString(),
         });
       } catch (error) {

@@ -5,7 +5,6 @@ export interface Track {
     total_ms: number;
     readable_length: string;
   };
-  preview_url?: string | null;
   image: string;
   title: string;
   id: string;

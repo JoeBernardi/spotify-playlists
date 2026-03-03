@@ -1,5 +1,8 @@
 export const cacheKey = "playlists";
 export const cacheTTLInSeconds = 2592000; // 30 days
+
+/** Playlists older than this (by month) are persisted to JSON and served from disk */
+export const STABLE_PLAYLIST_AGE_DAYS = 60;
 export const months = [
   "January",
   "February",
@@ -29,3 +32,6 @@ export const MONTH_TO_NUMBER: Record<(typeof months)[number], number> = {
   December: 12,
 };
 export const playlistLimit = 50;
+
+/** Delay between playlist track fetches to avoid Spotify rate limits (~180/min) */
+export const TRACK_FETCH_DELAY_MS = 150;

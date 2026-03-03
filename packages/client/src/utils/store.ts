@@ -9,7 +9,7 @@ export const setPlaylistsAtom = atom(
   },
 );
 
-export const loadedTrackIdsAtom = atom<Set<string>>(new Set());
+export const loadedTrackIdsAtom = atom<Set<string>>(new Set<string>());
 
 export const setPlaylistTracksAtom = atom(
   null,
@@ -21,8 +21,6 @@ export const setPlaylistTracksAtom = atom(
         `setPlaylistTracks: no playlist matched id "${id}". Available ids:`,
         playlists.map((p) => p.id),
       );
-    } else {
-      console.log(`[setPlaylistTracks] Merged ${tracks.length} tracks into playlist "${id}"`);
     }
     set(
       playlistsAtom,
@@ -36,7 +34,5 @@ export const tracksAtom: Atom<Track[]> = atom((get) => {
   const playlists = get(playlistsAtom);
   return playlists.flatMap((playlist) => playlist.tracks || []);
 });
-
-export const activeTrackIdAtom = atom<string>("");
 
 export const isLoadingAtom = atom<boolean>(true);

@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 
-import Player from "./Player";
 import NavYear from "./NavYear";
 import Link from "./Link";
 import type { Playlist } from "@spotify-playlists/shared";
@@ -50,7 +49,6 @@ const Nav = () => {
             toggleYear={toggleYear}
           />
         ))}
-        <Player />
         <section className="nav-meta">
           <Link className="nav-meta-title" href="/about">
             About

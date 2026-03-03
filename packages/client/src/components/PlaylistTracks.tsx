@@ -1,9 +1,5 @@
 import type { Track } from "@spotify-playlists/shared";
 import ClockIcon from "../assets/img/icons/clock.svg?react";
-import PauseIcon from "../assets/img/icons/pause.svg?react";
-import PlayIcon from "../assets/img/icons/play.svg?react";
-import { useAtom } from "jotai";
-import { activeTrackIdAtom } from "../utils/store";
 
 interface PlaylistTracksProps {
   tracks: Track[];
@@ -11,15 +7,10 @@ interface PlaylistTracksProps {
 }
 
 const PlaylistTracks = ({ tracks, showDates = false }: PlaylistTracksProps) => {
-  console.log(`[PlaylistTracks] Rendering ${tracks.length} tracks`);
-  const [activeTrackId, setActiveTrack] = useAtom(activeTrackIdAtom);
   return (
     <table className="playlist-tracks">
       <thead className="playlist-tracks-info">
         <tr>
-          <th className="playlist-tracks-info-type preview" scope="col">
-            &nbsp;
-          </th>
           <th className="playlist-tracks-info-type title" scope="col">
             Title
           </th>
@@ -48,31 +39,12 @@ const PlaylistTracks = ({ tracks, showDates = false }: PlaylistTracksProps) => {
             )
             .join(", ");
 
-          let previewElement = <div style={{ height: "24px" }}></div>;
-
-          if (track.preview_url) {
-            const isActiveTrack = track.id === activeTrackId;
-
-            if (!isActiveTrack) {
-              previewElement = (
-                <button onClick={() => setActiveTrack(track.id)}>
-                  <PlayIcon />
-                </button>
-              );
-            } else {
-              previewElement = (
-                <button onClick={() => setActiveTrack("")}>
-                  <PauseIcon />
-                </button>
-              );
-            }
-          }
-
           return (
-            <tr className="playlist-tracks-track">
-              <td className="playlist-tracks-track-info preview-icon">
-                {previewElement}
-              </td>
+            <tr
+              className="playlist-tracks-track"
+              key={track.id}
+              style={{ height: "44px" }}
+            >
               <td className="playlist-tracks-track-info title">
                 <a target="_blank" href={track.url}>
                   {track.title}

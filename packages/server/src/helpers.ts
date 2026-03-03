@@ -1,4 +1,6 @@
 import dotenv from "dotenv";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
 import NodeCache from "node-cache";
 
 import {
@@ -7,7 +9,13 @@ import {
   Track,
 } from "@spotify-playlists/shared";
 
-import { cacheTTLInSeconds, MONTH_TO_NUMBER, months } from "./consts";
+import {
+  cacheTTLInSeconds,
+  MONTH_TO_NUMBER,
+  months,
+  STABLE_PLAYLIST_AGE_DAYS,
+  TRACK_FETCH_DELAY_MS,
+} from "./consts";
 import {
   SpotifyApi,
   Playlist as SpotifyPlaylist,
@@ -23,7 +31,7 @@ export const playlistCache = new NodeCache({
 });
 
 const LISTING_CACHE_KEY = "playlist-listing";
-const tracksCacheKey = (id: string) => `tracks-${id}`;
+export const tracksCacheKey = (id: string) => `tracks-${id}`;
 
 const MAX_RETRIES = 3;
 const INITIAL_RETRY_MS = 2_000;
@@ -32,6 +40,70 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 let listingInProgress: Promise<Playlist[]> | null = null;
 const trackFetchesInProgress = new Map<string, Promise<Track[]>>();
+
+/** In-memory map of stable playlist tracks, loaded from JSON on startup */
+export const stablePlaylistsMap = new Map<string, Track[]>();
+
+function getStablePlaylistsPath(): string {
+  return (
+    process.env.STABLE_PLAYLISTS_PATH ??
+    path.join(process.cwd(), "data", "stable-playlists.json")
+  );
+}
+
+export function isPlaylistStable(month: string, year: string): boolean {
+  const monthIdx = months.indexOf(month);
+  if (monthIdx === -1) return false;
+  const yearNum = parseInt(year, 10);
+  if (isNaN(yearNum)) return false;
+  const lastDayOfMonth = new Date(yearNum, monthIdx + 1, 0);
+  const ageMs = Date.now() - lastDayOfMonth.getTime();
+  return ageMs > STABLE_PLAYLIST_AGE_DAYS * 24 * 60 * 60 * 1000;
+}
+
+export async function loadStablePlaylistsFromDisk(): Promise<void> {
+  const filePath = getStablePlaylistsPath();
+  try {
+    const raw = await readFile(filePath, "utf-8");
+    const data = JSON.parse(raw) as {
+      version?: number;
+      updatedAt?: string;
+      playlists?: Record<string, { tracks: Track[] }>;
+    };
+    const playlists = data.playlists ?? {};
+    stablePlaylistsMap.clear();
+    for (const [id, entry] of Object.entries(playlists)) {
+      if (entry?.tracks) stablePlaylistsMap.set(id, entry.tracks);
+    }
+    console.log(
+      `Loaded ${stablePlaylistsMap.size} stable playlists from ${filePath}`,
+    );
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    if ((e as NodeJS.ErrnoException).code === "ENOENT") {
+      console.log("No stable playlists file found, starting fresh");
+    } else {
+      console.warn(`Failed to load stable playlists: ${message}`);
+    }
+  }
+}
+
+export async function saveStablePlaylistsToDisk(): Promise<void> {
+  const filePath = getStablePlaylistsPath();
+  const dir = path.dirname(filePath);
+  await mkdir(dir, { recursive: true });
+  const playlists: Record<string, { tracks: Track[] }> = {};
+  for (const [id, tracks] of stablePlaylistsMap) {
+    playlists[id] = { tracks };
+  }
+  const data = {
+    version: 1,
+    updatedAt: new Date().toISOString(),
+    playlists,
+  };
+  await writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+  console.log(`Saved ${stablePlaylistsMap.size} stable playlists to ${filePath}`);
+}
 
 getEnv();
 
@@ -192,7 +264,7 @@ const normalizeTracks = ({
   playlistUrl: string;
 }): Track[] => {
   return tracksFromApi.map(({ track }) => {
-    const { name, duration_ms, id, album, external_urls, preview_url } = track;
+    const { name, duration_ms, id, album, external_urls } = track;
 
     return {
       url: external_urls.spotify,
@@ -208,7 +280,6 @@ const normalizeTracks = ({
       },
       album: { name: album.name, url: album.external_urls.spotify },
       playlistUrl,
-      preview_url,
       id,
       title: name,
     };
@@ -288,12 +359,20 @@ export async function fetchListing(): Promise<Playlist[]> {
 
 export async function fetchPlaylistTracks(
   playlistId: string,
+  opts?: { skipStableSave?: boolean },
 ): Promise<Track[]> {
   const key = tracksCacheKey(playlistId);
   const cached = playlistCache.get<Track[]>(key);
   if (cached) {
     console.log(`Using cached tracks for ${playlistId}`);
     return cached;
+  }
+
+  const stableTracks = stablePlaylistsMap.get(playlistId);
+  if (stableTracks) {
+    console.log(`Using stable disk cache for ${playlistId}`);
+    playlistCache.set(key, stableTracks);
+    return stableTracks;
   }
 
   const existing = trackFetchesInProgress.get(playlistId);
@@ -310,12 +389,16 @@ export async function fetchPlaylistTracks(
         () => api.playlists.getPlaylist(playlistId),
         `playlist ${playlistId}`,
       );
+      const [month, year] = playlist.name.split(" ");
+      const playlistDate = playlistNameToAbbreviatedDate(playlist.name);
+      const playlistUrl = playlist.external_urls.spotify;
       const tracks = normalizeTracks({
         tracksFromApi: getTrackItems(playlist),
-        playlistDate: playlistNameToAbbreviatedDate(playlist.name),
-        playlistUrl: playlist.external_urls.spotify,
+        playlistDate,
+        playlistUrl,
       });
       console.log(`Fetched ${tracks.length} tracks for ${playlistId}`);
+
       const setOk = playlistCache.set(key, tracks);
       if (!setOk) {
         console.warn(`Cache set failed for ${key}`);
@@ -325,6 +408,14 @@ export async function fetchPlaylistTracks(
           `Cache verified for ${key}: ${verified?.length ?? "null"} tracks`,
         );
       }
+
+      if (isPlaylistStable(month, year)) {
+        stablePlaylistsMap.set(playlistId, tracks);
+        if (!opts?.skipStableSave) {
+          await saveStablePlaylistsToDisk();
+        }
+      }
+
       return tracks;
     } finally {
       trackFetchesInProgress.delete(playlistId);
@@ -335,9 +426,91 @@ export async function fetchPlaylistTracks(
   return promise;
 }
 
+/**
+ * Hydrates the track cache in the background by sequentially fetching tracks
+ * for all playlists with a delay between requests to avoid Spotify rate limits.
+ * Stable playlists (older than 60 days) are served from disk when available;
+ * only recent playlists and missing stable ones hit the Spotify API.
+ * Does not block; runs fire-and-forget.
+ */
+export function hydrateTrackCache(): void {
+  (async () => {
+    try {
+      const playlists = await fetchListing();
+      console.log(
+        `[hydrate] Starting background track cache hydration for ${playlists.length} playlists`,
+      );
+      let stableFromDisk = 0;
+      let fetchedFromApi = 0;
+      for (let i = 0; i < playlists.length; i++) {
+        const playlist = playlists[i];
+        try {
+          const stableTracks = stablePlaylistsMap.get(playlist.id);
+          if (
+            stableTracks &&
+            isPlaylistStable(playlist.month, playlist.year)
+          ) {
+            playlistCache.set(tracksCacheKey(playlist.id), stableTracks);
+            stableFromDisk++;
+          } else {
+            await fetchPlaylistTracks(playlist.id);
+            fetchedFromApi++;
+          }
+        } catch (err) {
+          console.error(
+            `[hydrate] Failed to fetch tracks for ${playlist.id}:`,
+            err,
+          );
+        }
+        if (i < playlists.length - 1) {
+          await sleep(TRACK_FETCH_DELAY_MS);
+        }
+      }
+      console.log(
+        `[hydrate] Track cache hydration complete (${stableFromDisk} from disk, ${fetchedFromApi} from API)`,
+      );
+    } catch (err) {
+      console.error("[hydrate] Track cache hydration failed:", err);
+    }
+  })();
+}
+
+/** Stats computed from disk/cached track data (stable + in-memory cache). */
+export interface PlaylistStats {
+  playlistCount: number;
+  totalTrackCount: number;
+  totalDurationMs: number;
+}
+
+export async function fetchStats(): Promise<PlaylistStats> {
+  const playlists = await fetchListing();
+  let totalTrackCount = 0;
+  let totalDurationMs = 0;
+
+  for (const playlist of playlists) {
+    const stableTracks = stablePlaylistsMap.get(playlist.id);
+    const cachedTracks = playlistCache.get<Track[]>(tracksCacheKey(playlist.id));
+    const tracks = stableTracks ?? cachedTracks ?? [];
+
+    totalTrackCount += tracks.length;
+    totalDurationMs += tracks.reduce(
+      (acc, t) => acc + (t.length?.total_ms ?? 0),
+      0,
+    );
+  }
+
+  return {
+    playlistCount: playlists.length,
+    totalTrackCount,
+    totalDurationMs,
+  };
+}
+
 export default {
   fetchListing,
   fetchPlaylistTracks,
+  fetchStats,
+  hydrateTrackCache,
   getEnv,
   playlistCache,
 };

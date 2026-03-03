@@ -5,7 +5,6 @@ import NextIcon from "../assets/img/icons/next.svg?react";
 import PrevIcon from "../assets/img/icons/prev.svg?react";
 
 import PlaylistTracks from "./PlaylistTracks";
-import Loader from "./Loader";
 import { usePlaylist, usePlaylists, usePlaylistTracks } from "../utils/hooks";
 import { useMemo } from "react";
 
@@ -13,7 +12,7 @@ const Playlist = ({ id }: { id?: string }) => {
   const navigate = useNavigate();
   const allPlaylists = usePlaylists();
   const playlist = usePlaylist(id);
-  const { isLoadingTracks } = usePlaylistTracks(id);
+  usePlaylistTracks(id);
 
   const sortedPlaylistIds = useMemo(() => {
     return allPlaylists.map((playlist) => playlist.id);
@@ -86,13 +85,7 @@ const Playlist = ({ id }: { id?: string }) => {
           )}
         </div>
       </div>
-      {isLoadingTracks ? (
-        <div className="playlist-loading">
-          <Loader variant="inline" />
-        </div>
-      ) : (
-        <PlaylistTracks tracks={playlist.tracks ?? []} />
-      )}
+      <PlaylistTracks tracks={playlist.tracks ?? []} />
     </section>
   );
 };

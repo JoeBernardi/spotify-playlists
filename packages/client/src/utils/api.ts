@@ -20,6 +20,12 @@ const getApiBaseUrl = (): string => {
 
 export const API_BASE_URL = getApiBaseUrl();
 
+export interface PlaylistStats {
+  playlistCount: number;
+  totalTrackCount: number;
+  totalDurationMs: number;
+}
+
 export const fetchPlaylists = async (): Promise<Playlist[]> => {
   const response = await fetch(`${API_BASE_URL}/playlists`);
 
@@ -30,6 +36,18 @@ export const fetchPlaylists = async (): Promise<Playlist[]> => {
   }
 
   return (await response.json()) as Playlist[];
+};
+
+export const fetchStats = async (): Promise<PlaylistStats> => {
+  const response = await fetch(`${API_BASE_URL}/playlists/stats`);
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch stats: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  return (await response.json()) as PlaylistStats;
 };
 
 export const fetchPlaylistTracks = async (id: string): Promise<Track[]> => {

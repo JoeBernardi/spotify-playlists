@@ -2,7 +2,11 @@ import Fastify from "fastify";
 import { registerAdminRoutes } from "./admin.js";
 import { registerStaticRoutes } from "./static.js";
 import { registerApiRoutes } from "./api.js";
-import { fetchListing, fetchPlaylistTracks } from "./helpers.js";
+import {
+  fetchListing,
+  hydrateTrackCache,
+  loadStablePlaylistsFromDisk,
+} from "./helpers.js";
 
 const fastify = Fastify({ logger: true });
 
@@ -38,20 +42,26 @@ async function main() {
     }
   });
 
+  console.log("Loading stable playlists from disk...");
+  try {
+    await loadStablePlaylistsFromDisk();
+    console.log("Stable playlists loaded");
+  } catch (e) {
+    console.error("Failed to load stable playlists:", e);
+  }
+
   console.log("Pre-warming playlist listing cache...");
   try {
-    const playlists = await fetchListing();
+    await fetchListing();
     console.log("Listing cache pre-warmed successfully");
-    if (playlists.length > 0) {
-      console.log("Pre-warming newest playlist tracks...");
-      await fetchPlaylistTracks(playlists[0].id);
-      console.log("Newest playlist tracks pre-warmed");
-    }
   } catch (e) {
     console.error("Listing cache pre-warm failed:", e);
   }
 
   await fastify.listen({ port, host: "0.0.0.0" });
+
+  // Hydrate track cache in background (sequential + delay to avoid rate limits)
+  hydrateTrackCache();
   const address = fastify.server.address();
 
   if (!address || typeof address === "string") {
