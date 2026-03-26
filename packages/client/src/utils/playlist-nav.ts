@@ -2,11 +2,15 @@ import { usePlaylists } from "./hooks";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { useMemo, useEffect } from "react";
 
-export const usePlaylistNav = () => {
+export const usePlaylistNav = (playlistIdFromProps?: string) => {
   const playlists = usePlaylists();
   const navigate = useNavigate();
 
-  const { id: currentPlaylistId } = useParams({ from: "/playlist/$id" });
+  const playlistParams = useParams({
+    from: "/playlist/$id",
+    shouldThrow: false,
+  });
+  const currentPlaylistId = playlistParams?.id ?? playlistIdFromProps;
 
   const playlistNeighborIds = useMemo(() => {
     const allPlaylistIds = playlists.map((p) => p.id);

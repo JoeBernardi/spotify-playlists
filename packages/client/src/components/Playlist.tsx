@@ -9,7 +9,7 @@ import Lightbox from "./Lightbox";
 import { usePlaylist, usePlaylistTracks } from "../utils/hooks";
 
 const Playlist = ({ id }: { id?: string }) => {
-  const playlistNav = usePlaylistNav();
+  const playlistNav = usePlaylistNav(id);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [coverState, setCoverState] = useState<{
     playlistImageUrl: string;
