@@ -2,12 +2,14 @@ import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import Nav from "../components/Nav";
 import MobileFooter from "../components/MobileFooter";
+import NotFoundRedirect from "../components/NotFoundRedirect";
 import { useFetchPlaylists } from "../utils/hooks";
 import Loader from "../components/Loader";
 import { useAtomValue } from "jotai";
 import { isLoadingAtom } from "../utils/store";
 
 export const Route = createRootRoute({
+  notFoundComponent: NotFoundRedirect,
   component: () => {
     const isDevelopment = import.meta.env.DEV;
     useFetchPlaylists();

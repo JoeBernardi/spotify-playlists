@@ -5,9 +5,13 @@ import "./assets/css/main.scss";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen.js";
+import NotFoundRedirect from "./components/NotFoundRedirect";
 
 // Create a new router instance
-const router = createRouter({ routeTree });
+const router = createRouter({
+  routeTree,
+  defaultNotFoundComponent: NotFoundRedirect,
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
