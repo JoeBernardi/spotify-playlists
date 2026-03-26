@@ -101,6 +101,9 @@ export const usePlaylistTracks = (id?: string) => {
   return { isLoadingTracks: isLoading && !isLoaded };
 };
 
+/** Parallel playlist track fetches; bounded to avoid hammering the API / browser connection limits. */
+const TRACK_FETCH_CONCURRENCY = 6;
+
 export const useAllPlaylistTracks = () => {
   const playlists = useAtomValue(playlistsAtom);
   const setTracks = useSetAtom(setPlaylistTracksAtom);
@@ -117,24 +120,27 @@ export const useAllPlaylistTracks = () => {
     fetchingRef.current = true;
     setIsLoading(true);
 
-    const TRACK_FETCH_DELAY_MS = 150;
     (async () => {
-      for (let i = 0; i < unloaded.length; i++) {
-        const playlist = unloaded[i];
-        try {
-          const t = await fetchPlaylistTracks(playlist.id);
-          setTracks({ id: playlist.id, tracks: t });
-        } catch (err) {
-          console.error(`Failed to fetch tracks for ${playlist.id}:`, err);
+      try {
+        for (let i = 0; i < unloaded.length; i += TRACK_FETCH_CONCURRENCY) {
+          const batch = unloaded.slice(i, i + TRACK_FETCH_CONCURRENCY);
+          await Promise.all(
+            batch.map(async (playlist) => {
+              try {
+                const t = await fetchPlaylistTracks(playlist.id);
+                setTracks({ id: playlist.id, tracks: t });
+              } catch (err) {
+                console.error(`Failed to fetch tracks for ${playlist.id}:`, err);
+              }
+            }),
+          );
         }
-        if (i < unloaded.length - 1) {
-          await new Promise((r) => setTimeout(r, TRACK_FETCH_DELAY_MS));
-        }
+      } finally {
+        setIsLoading(false);
+        fetchingRef.current = false;
       }
-      setIsLoading(false);
-      fetchingRef.current = false;
     })();
-  }, [playlists]);
+  }, [playlists, setTracks]);
 
   return { tracks, isLoading };
 };
