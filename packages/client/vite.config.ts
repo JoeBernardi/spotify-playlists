@@ -5,8 +5,12 @@ import svgr from "vite-plugin-svgr";
 import webfontDownload from "vite-plugin-webfont-dl";
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [
+export default defineConfig(() => {
+  const apiProxyTarget =
+    process.env.VITE_API_PROXY_TARGET || "http://127.0.0.1:8005";
+
+  return {
+    plugins: [
     tanstackRouter({
       target: "react",
       autoCodeSplitting: true,
@@ -19,14 +23,21 @@ export default defineConfig({
     svgr(),
     webfontDownload(),
   ],
-  server: {
-    port: 5173,
-    host: true,
-  },
-  optimizeDeps: {
-    exclude: ["@spotify-playlists/shared"],
-  },
-  define: {
-    global: "globalThis",
-  },
+    server: {
+      port: 5173,
+      host: true,
+      proxy: {
+        "/playlists": {
+          target: apiProxyTarget,
+          changeOrigin: true,
+        },
+      },
+    },
+    optimizeDeps: {
+      exclude: ["@spotify-playlists/shared"],
+    },
+    define: {
+      global: "globalThis",
+    },
+  };
 });

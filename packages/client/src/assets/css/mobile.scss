@@ -4,10 +4,15 @@
 	.wrapper {
 		.content {
 			min-height: calc(100vh - 100px);
+			min-height: calc(100svh - 100px);
+			min-height: calc(100dvh - 100px);
 			.copy {
 				margin: 35px 0 100px;
 			}
 			.playlist {
+				flex: 0 1 auto;
+				min-height: min-content; 
+
 				&-info {
 					padding-top: 35px;
 					flex-direction: column;
@@ -35,7 +40,7 @@
 				}
 
 				&-tracks {
-					margin-bottom: 85px;
+					margin-bottom: 0;
 					&-info {
 						&-type {
 							&.album, &.length {
@@ -67,7 +72,12 @@
 		.content {
 			max-height: calc(100vh - 100px);
 			min-height: calc(100vh - 100px);
+			max-height: calc(100svh - 100px);
+			min-height: calc(100svh - 100px);
+			max-height: calc(100dvh - 100px);
+			min-height: calc(100dvh - 100px);
 			padding-top: 0;
+			padding-bottom: calc(65px + env(safe-area-inset-bottom));
 			.copy {
 				p {
 					width: 100%;
@@ -164,9 +174,12 @@
 			display: block;
 			position: fixed;
 			bottom: 0;
+			left: 0;
+			right: 0;
 			background: $dark;
 			width: 100%;
 			height: 45px;
+			padding-bottom: env(safe-area-inset-bottom);
 			display: flex;
 			justify-content: space-between;
 			align-items: center;

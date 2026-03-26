@@ -1,9 +1,5 @@
 import { FastifyInstance } from "fastify";
-import {
-  fetchListing,
-  fetchPlaylistTracks,
-  fetchStats,
-} from "./helpers.js";
+import { fetchListing, fetchPlaylistTracks, fetchStats } from "./helpers.js";
 import { cacheTTLInSeconds } from "./consts.js";
 
 export const registerApiRoutes = async (fastify: FastifyInstance) => {

@@ -25,13 +25,32 @@
 				flex-shrink: 0;
 				padding: 0;
 				border: 0;
-				background: none;
+				background: $dark;
 				cursor: zoom-in;
+
+				&:disabled {
+					cursor: wait;
+				}
 
 				img {
 					width: 200px;
 					height: 200px;
 					object-fit: cover;
+					vertical-align: middle;
+				}
+
+				&-placeholder {
+					display: block;
+					width: 200px;
+					height: 200px;
+					background: linear-gradient(
+						105deg,
+						$dark 0%,
+						$dark-alternate 45%,
+						$dark 90%
+					);
+					background-size: 220% 100%;
+					animation: playlist-cover-placeholder 1.1s ease-in-out infinite;
 				}
 			}
 
@@ -158,4 +177,13 @@
 			}
 		}
 	}	
+}
+
+@keyframes playlist-cover-placeholder {
+	0% {
+		background-position: 100% 0;
+	}
+	100% {
+		background-position: -100% 0;
+	}
 }

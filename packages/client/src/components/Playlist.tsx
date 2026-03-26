@@ -1,46 +1,73 @@
-import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-
+import { useEffect, useState } from "react";
+import { usePlaylistNav } from "../utils/playlist-nav";
 import LinkIcon from "../assets/img/icons/link.svg?react";
 import NextIcon from "../assets/img/icons/next.svg?react";
 import PrevIcon from "../assets/img/icons/prev.svg?react";
 
 import PlaylistTracks from "./PlaylistTracks";
 import Lightbox from "./Lightbox";
-import { usePlaylist, usePlaylists, usePlaylistTracks } from "../utils/hooks";
+import { usePlaylist, usePlaylistTracks } from "../utils/hooks";
 
 const Playlist = ({ id }: { id?: string }) => {
-  const navigate = useNavigate();
+  const playlistNav = usePlaylistNav();
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const allPlaylists = usePlaylists();
+  const [coverState, setCoverState] = useState<{
+    playlistImageUrl: string;
+    playlistId: string;
+  } | null>(null);
   const playlist = usePlaylist(id);
   usePlaylistTracks(id);
 
-  const sortedPlaylistIds = useMemo(() => {
-    return allPlaylists.map((playlist) => playlist.id);
-  }, [allPlaylists]);
+  useEffect(() => {
+    setLightboxOpen(false);
+  }, [playlist?.id]);
 
-  const activePlaylistIndex = useMemo(() => {
-    return sortedPlaylistIds.indexOf(playlist?.id ?? "");
-  }, [sortedPlaylistIds, playlist]);
+  useEffect(() => {
+    const playlistImageUrl = playlist?.image;
+    const playlistId = playlist?.id;
 
-  const previousPlaylist = () => {
-    const previousPlaylistId = sortedPlaylistIds[activePlaylistIndex + 1];
-    navigate({ to: `/playlist/${previousPlaylistId}` });
-  };
+    if (!playlistImageUrl || !playlistId) {
+      setCoverState(null);
+      return;
+    }
 
-  const nextPlaylist = () => {
-    const nextPlaylistId = sortedPlaylistIds[activePlaylistIndex - 1];
-    navigate({ to: `/playlist/${nextPlaylistId}` });
-  };
+    let cancelled = false;
+    const img = new Image();
+    img.onload = () => {
+      if (!cancelled)
+        setCoverState({
+          playlistImageUrl,
+          playlistId,
+        });
+    };
+    img.onerror = () => {
+      if (!cancelled)
+        setCoverState({
+          playlistImageUrl,
+          playlistId,
+        });
+    };
+    img.src = playlistImageUrl;
+    return () => {
+      cancelled = true;
+    };
+  }, [playlist?.id, playlist?.image]);
 
   if (!playlist) {
     return null;
   }
 
-  const prevButtonDisabled =
-    activePlaylistIndex + 1 === sortedPlaylistIds.length;
-  const nextButtonDisabled = activePlaylistIndex === 0;
+  const {
+    nextButtonDisabled,
+    prevButtonDisabled,
+    playlistNeighborIds,
+    goToPlaylist,
+  } = playlistNav;
+
+  const coverReady =
+    coverState != null &&
+    coverState.playlistId === playlist.id &&
+    coverState.playlistImageUrl === playlist.image;
 
   return (
     <section className="playlist">
@@ -49,10 +76,24 @@ const Playlist = ({ id }: { id?: string }) => {
           <button
             type="button"
             className="playlist-info-image"
-            onClick={() => setLightboxOpen(true)}
+            disabled={!coverReady}
+            aria-busy={!coverReady}
+            onClick={() => coverReady && setLightboxOpen(true)}
             aria-label={`View cover art for ${playlist.title}`}
           >
-            <img src={playlist.image} alt={playlist.title} />
+            {coverReady && coverState ? (
+              <img
+                src={coverState.playlistImageUrl}
+                alt={playlist.title}
+                decoding="async"
+                fetchPriority="high"
+              />
+            ) : (
+              <span
+                className="playlist-info-image-placeholder"
+                aria-hidden="true"
+              />
+            )}
           </button>
         )}
         {lightboxOpen && playlist.image && (
@@ -71,7 +112,7 @@ const Playlist = ({ id }: { id?: string }) => {
               <button
                 className="playlist-info-text-header-nav-button prev"
                 disabled={prevButtonDisabled}
-                onClick={() => previousPlaylist()}
+                onClick={() => goToPlaylist(playlistNeighborIds[0])}
               >
                 <PrevIcon />
               </button>
@@ -85,7 +126,7 @@ const Playlist = ({ id }: { id?: string }) => {
               <button
                 className="playlist-info-text-header-nav-button next"
                 disabled={nextButtonDisabled}
-                onClick={() => nextPlaylist()}
+                onClick={() => goToPlaylist(playlistNeighborIds[1])}
               >
                 <NextIcon />
               </button>

@@ -27,7 +27,7 @@ const Nav = () => {
         }
         return acc;
       }, {}),
-    [playlists]
+    [playlists],
   );
 
   const years = Object.keys(playlistsByYear).reverse();

@@ -5,14 +5,17 @@
 
 import type { Playlist, Track } from "@spotify-playlists/shared";
 
-const getApiBaseUrl = (): string => {
-  if (import.meta.env.DEV) {
-    return "http://localhost:3000";
-  }
+const inflightTrackRequests = new Map<string, Promise<Track[]>>();
 
+const getApiBaseUrl = (): string => {
   const apiUrl = import.meta.env.VITE_API_URL;
   if (apiUrl) {
     return apiUrl;
+  }
+
+  if (import.meta.env.DEV) {
+    // In local dev, use Vite proxy so the browser calls /playlists on 5173.
+    return "";
   }
 
   return window.location.origin;
@@ -51,13 +54,27 @@ export const fetchStats = async (): Promise<PlaylistStats> => {
 };
 
 export const fetchPlaylistTracks = async (id: string): Promise<Track[]> => {
-  const response = await fetch(`${API_BASE_URL}/playlists/${id}/tracks`);
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch tracks: ${response.status} ${response.statusText}`,
-    );
+  const existingRequest = inflightTrackRequests.get(id);
+  if (existingRequest) {
+    return existingRequest;
   }
 
-  return (await response.json()) as Track[];
+  const request = (async () => {
+    const response = await fetch(`${API_BASE_URL}/playlists/${id}/tracks`);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch tracks: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return (await response.json()) as Track[];
+  })();
+
+  inflightTrackRequests.set(id, request);
+
+  try {
+    return await request;
+  } finally {
+    inflightTrackRequests.delete(id);
+  }
 };

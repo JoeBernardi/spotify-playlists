@@ -63,7 +63,8 @@ const About = () => {
         though, I began to second-guess whether I'd already used a given song.
         Spotify doesn't make it easy to search all your playlists at once, so I
         made this thing as an un-branded way to catalog everything. There's a
-        page <Link href="/everything">here</Link> that just lists all the songs.
+        page <Link href="/search">here</Link> that allows you to search all the
+        songs.
       </p>
 
       <p>
