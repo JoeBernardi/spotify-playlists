@@ -23,6 +23,9 @@ const getApiBaseUrl = (): string => {
 
 export const API_BASE_URL = getApiBaseUrl();
 
+const fetchNoStore = (input: string) =>
+  fetch(input, { cache: "no-store" });
+
 export interface PlaylistStats {
   playlistCount: number;
   totalTrackCount: number;
@@ -30,7 +33,7 @@ export interface PlaylistStats {
 }
 
 export const fetchPlaylists = async (): Promise<Playlist[]> => {
-  const response = await fetch(`${API_BASE_URL}/playlists`);
+  const response = await fetchNoStore(`${API_BASE_URL}/playlists`);
 
   if (!response.ok) {
     throw new Error(
@@ -42,7 +45,7 @@ export const fetchPlaylists = async (): Promise<Playlist[]> => {
 };
 
 export const fetchStats = async (): Promise<PlaylistStats> => {
-  const response = await fetch(`${API_BASE_URL}/playlists/stats`);
+  const response = await fetchNoStore(`${API_BASE_URL}/playlists/stats`);
 
   if (!response.ok) {
     throw new Error(
@@ -60,7 +63,9 @@ export const fetchPlaylistTracks = async (id: string): Promise<Track[]> => {
   }
 
   const request = (async () => {
-    const response = await fetch(`${API_BASE_URL}/playlists/${id}/tracks`);
+    const response = await fetchNoStore(
+      `${API_BASE_URL}/playlists/${id}/tracks`,
+    );
     if (!response.ok) {
       throw new Error(
         `Failed to fetch tracks: ${response.status} ${response.statusText}`,

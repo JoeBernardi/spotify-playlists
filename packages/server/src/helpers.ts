@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import NodeCache from "node-cache";
 
@@ -103,6 +103,19 @@ export async function saveStablePlaylistsToDisk(): Promise<void> {
   };
   await writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
   console.log(`Saved ${stablePlaylistsMap.size} stable playlists to ${filePath}`);
+}
+
+/** Drops stable playlist snapshots from memory and deletes the JSON file so track fetches hit Spotify. */
+export async function clearStablePlaylistsCache(): Promise<void> {
+  stablePlaylistsMap.clear();
+  const filePath = getStablePlaylistsPath();
+  try {
+    await unlink(filePath);
+    console.log(`Removed stable playlists cache: ${filePath}`);
+  } catch (e) {
+    const code = (e as NodeJS.ErrnoException).code;
+    if (code !== "ENOENT") throw e;
+  }
 }
 
 getEnv();
@@ -264,12 +277,12 @@ const normalizeTracks = ({
   playlistUrl: string;
 }): Track[] => {
   return tracksFromApi.map(({ track }) => {
-    const { name, duration_ms, id, album, external_urls } = track;
+    const { name, duration_ms, id, album, external_urls, artists } = track;
 
     return {
       url: external_urls.spotify,
       image: album.images[1]?.url ?? album.images[0]?.url,
-      artist: album.artists.map((a) => ({
+      artist: artists.map((a) => ({
         name: a.name,
         url: a.external_urls.spotify,
       })),

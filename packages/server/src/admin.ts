@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import {
+  clearStablePlaylistsCache,
   fetchListing,
   fetchPlaylistTracks,
   isPlaylistStable,
@@ -17,7 +18,7 @@ export async function registerAdminRoutes(fastify: FastifyInstance) {
   await fastify.register(import("@fastify/basic-auth"), {
     validate: async (username, password) => {
       const adminUsername = process.env.ADMIN_USERNAME;
-      const adminPassword = process.env.ADMIN_PASSWORD;
+      const adminPassword = process.env.ADMIN_PASS;
 
       if (!adminUsername || !adminPassword) {
         throw new Error("Admin credentials not configured");
@@ -39,9 +40,11 @@ export async function registerAdminRoutes(fastify: FastifyInstance) {
     async (_req, res) => {
       try {
         playlistCache.flushAll();
+        await clearStablePlaylistsCache();
         return res.send({
           success: true,
-          message: "Cache cleared successfully",
+          message:
+            "In-memory cache and stable disk snapshot cleared; tracks will refetch from Spotify",
           timestamp: new Date().toISOString(),
         });
       } catch (error) {
@@ -51,7 +54,7 @@ export async function registerAdminRoutes(fastify: FastifyInstance) {
           error: error instanceof Error ? error.message : "Unknown error",
         });
       }
-    }
+    },
   );
 
   // Admin endpoint to refresh stable playlists from Spotify and overwrite JSON
@@ -86,7 +89,7 @@ export async function registerAdminRoutes(fastify: FastifyInstance) {
           error: error instanceof Error ? error.message : "Unknown error",
         });
       }
-    }
+    },
   );
 
   // Admin endpoint to check cache status
@@ -111,6 +114,6 @@ export async function registerAdminRoutes(fastify: FastifyInstance) {
           error: error instanceof Error ? error.message : "Unknown error",
         });
       }
-    }
+    },
   );
 }

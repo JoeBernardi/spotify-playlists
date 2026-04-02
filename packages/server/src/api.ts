@@ -1,14 +1,14 @@
 import { FastifyInstance } from "fastify";
 import { fetchListing, fetchPlaylistTracks, fetchStats } from "./helpers.js";
-import { cacheTTLInSeconds } from "./consts.js";
+
+/** JSON that reflects live Spotify data; avoid browser/proxy caching stale listings. */
+const API_NO_STORE = "private, no-store";
 
 export const registerApiRoutes = async (fastify: FastifyInstance) => {
   fastify.get("/playlists/stats", async (_req, reply) => {
     try {
       const stats = await fetchStats();
-      return reply
-        .header("Cache-Control", `public, max-age=${cacheTTLInSeconds}`)
-        .send(stats);
+      return reply.header("Cache-Control", API_NO_STORE).send(stats);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Unknown error";
       fastify.log.error({ err: e }, "Failed to fetch stats");
@@ -21,9 +21,7 @@ export const registerApiRoutes = async (fastify: FastifyInstance) => {
   fastify.get("/playlists", async (_req, reply) => {
     try {
       const playlists = await fetchListing();
-      return reply
-        .header("Cache-Control", `public, max-age=${cacheTTLInSeconds}`)
-        .send(playlists);
+      return reply.header("Cache-Control", API_NO_STORE).send(playlists);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Unknown error";
       fastify.log.error({ err: e }, "Failed to fetch playlists");
@@ -41,9 +39,7 @@ export const registerApiRoutes = async (fastify: FastifyInstance) => {
         fastify.log.info(
           `Sending ${tracks.length} tracks for playlist ${req.params.id}`,
         );
-        return reply
-          .header("Cache-Control", `public, max-age=${cacheTTLInSeconds}`)
-          .send(tracks);
+        return reply.header("Cache-Control", API_NO_STORE).send(tracks);
       } catch (e) {
         const message = e instanceof Error ? e.message : "Unknown error";
         fastify.log.error(
