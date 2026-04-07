@@ -3,9 +3,6 @@
 @media screen and (max-width: 600px) {
 	.wrapper {
 		.content {
-			min-height: calc(100vh - 100px);
-			min-height: calc(100svh - 100px);
-			min-height: calc(100dvh - 100px);
 			.copy {
 				margin: 35px 0 100px;
 			}
@@ -64,18 +61,11 @@
 
 @media screen and (max-width: 440px) {
 	.wrapper {
-
 		> .sidebar {
 			display: none;
 		}
 
 		.content {
-			max-height: calc(100vh - 100px);
-			min-height: calc(100vh - 100px);
-			max-height: calc(100svh - 100px);
-			min-height: calc(100svh - 100px);
-			max-height: calc(100dvh - 100px);
-			min-height: calc(100dvh - 100px);
 			padding-top: 0;
 			padding-bottom: calc(65px + env(safe-area-inset-bottom));
 			.copy {
