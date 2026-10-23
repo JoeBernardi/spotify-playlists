@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import NodeCache from "node-cache";
 
@@ -16,12 +16,42 @@ import {
   STABLE_PLAYLIST_AGE_DAYS,
   TRACK_FETCH_DELAY_MS,
 } from "./consts";
-import {
-  SpotifyApi,
-  Playlist as SpotifyPlaylist,
-  Track as SpotifyTrack,
-  PlaylistedTrack,
-} from "@spotify/web-api-ts-sdk";
+
+export class SpotifyUpstreamError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly retryAfterSeconds?: number,
+  ) {
+    super(message);
+    this.name = "SpotifyUpstreamError";
+  }
+}
+
+interface SpotifyTrack {
+  id: string | null;
+  name: string;
+  type: string;
+  duration_ms: number;
+  external_urls?: { spotify?: string };
+  artists?: Array<{ name: string; external_urls?: { spotify?: string } }>;
+  album?: {
+    name: string;
+    images?: Array<{ url: string }>;
+    external_urls?: { spotify?: string };
+  };
+}
+
+interface SpotifyPlaylist {
+  id: string;
+  name: string;
+  description?: string | null;
+  public: boolean | null;
+  external_urls: { spotify: string };
+  images?: Array<{ url: string }>;
+  items?: { items?: Array<{ item?: SpotifyTrack | null }> };
+  tracks?: { items?: Array<{ track?: SpotifyTrack | null }> };
+}
 
 export const getEnv = (): any => dotenv.config().parsed;
 
@@ -31,6 +61,7 @@ export const playlistCache = new NodeCache({
 });
 
 const LISTING_CACHE_KEY = "playlist-listing";
+const LISTING_CACHE_TTL_SECONDS = 60 * 60;
 export const tracksCacheKey = (id: string) => `tracks-${id}`;
 
 const MAX_RETRIES = 3;
@@ -40,6 +71,9 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 let listingInProgress: Promise<Playlist[]> | null = null;
 const trackFetchesInProgress = new Map<string, Promise<Track[]>>();
+let stableSaveInProgress: Promise<void> = Promise.resolve();
+let lastSpotifySuccessAt: string | null = null;
+let lastSpotifyErrorAt: string | null = null;
 
 /** In-memory map of stable playlist tracks, loaded from JSON on startup */
 export const stablePlaylistsMap = new Map<string, Track[]>();
@@ -89,24 +123,29 @@ export async function loadStablePlaylistsFromDisk(): Promise<void> {
 }
 
 export async function saveStablePlaylistsToDisk(): Promise<void> {
-  const filePath = getStablePlaylistsPath();
-  const dir = path.dirname(filePath);
-  await mkdir(dir, { recursive: true });
-  const playlists: Record<string, { tracks: Track[] }> = {};
-  for (const [id, tracks] of stablePlaylistsMap) {
-    playlists[id] = { tracks };
-  }
-  const data = {
-    version: 1,
-    updatedAt: new Date().toISOString(),
-    playlists,
-  };
-  await writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
-  console.log(`Saved ${stablePlaylistsMap.size} stable playlists to ${filePath}`);
+  stableSaveInProgress = stableSaveInProgress.catch(() => undefined).then(async () => {
+    const filePath = getStablePlaylistsPath();
+    const dir = path.dirname(filePath);
+    const tempPath = `${filePath}.${process.pid}.tmp`;
+    await mkdir(dir, { recursive: true });
+    const playlists: Record<string, { tracks: Track[] }> = {};
+    for (const [id, tracks] of stablePlaylistsMap) playlists[id] = { tracks };
+    const data = { version: 1, updatedAt: new Date().toISOString(), playlists };
+    await writeFile(tempPath, JSON.stringify(data, null, 2), "utf-8");
+    try {
+      await copyFile(filePath, `${filePath}.backup`);
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== "ENOENT") throw e;
+    }
+    await rename(tempPath, filePath);
+    console.log(`Saved ${stablePlaylistsMap.size} stable playlists to ${filePath}`);
+  });
+  return stableSaveInProgress;
 }
 
 /** Drops stable playlist snapshots from memory and deletes the JSON file so track fetches hit Spotify. */
 export async function clearStablePlaylistsCache(): Promise<void> {
+  await stableSaveInProgress.catch(() => undefined);
   stablePlaylistsMap.clear();
   const filePath = getStablePlaylistsPath();
   try {
@@ -127,14 +166,16 @@ async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
     try {
       return await fn();
     } catch (err) {
-      const isRateLimit =
-        err instanceof Error && /rate limit/i.test(err.message);
-      if (!isRateLimit || attempt === MAX_RETRIES) throw err;
+      const retryable =
+        err instanceof SpotifyUpstreamError &&
+        (err.status === 429 || err.status >= 500);
+      if (!retryable || attempt === MAX_RETRIES) throw err;
 
-      const backoff = INITIAL_RETRY_MS * 2 ** attempt;
-      console.warn(
-        `Rate limited (${label}), retrying in ${backoff}ms (attempt ${attempt + 1}/${MAX_RETRIES})...`,
-      );
+      const backoff =
+        err.retryAfterSeconds != null
+          ? err.retryAfterSeconds * 1_000
+          : INITIAL_RETRY_MS * 2 ** attempt;
+      console.warn(`Spotify request failed (${label}), retrying in ${backoff}ms (attempt ${attempt + 1}/${MAX_RETRIES})...`);
       await sleep(backoff);
     }
   }
@@ -143,13 +184,13 @@ async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
 
 // --- Auth / API instance ---
 
-let cachedApi: { api: SpotifyApi; expiresAt: number } | null = null;
+let cachedToken: { accessToken: string; expiresAt: number } | null = null;
 
 async function getAccessToken(
   clientId: string,
   clientSecret: string,
   refreshToken: string,
-): Promise<string> {
+): Promise<{ accessToken: string; expiresIn: number }> {
   const response = await fetch("https://accounts.spotify.com/api/token", {
     method: "POST",
     headers: {
@@ -162,20 +203,27 @@ async function getAccessToken(
     }),
   });
 
-  const data = await response.json();
+  const data = (await response.json().catch(() => ({}))) as {
+    access_token?: string;
+    expires_in?: number;
+    error?: string;
+    error_description?: string;
+  };
 
-  if (data.error) {
-    throw new Error(
-      `Token refresh failed: ${data.error_description || data.error}`,
+  if (!response.ok || !data.access_token) {
+    lastSpotifyErrorAt = new Date().toISOString();
+    throw new SpotifyUpstreamError(
+      `Token refresh failed: ${data.error_description || data.error || response.statusText}`,
+      response.status,
     );
   }
 
-  return data.access_token;
+  return { accessToken: data.access_token, expiresIn: data.expires_in ?? 3600 };
 }
 
-async function getSpotifyApi(): Promise<SpotifyApi> {
-  if (cachedApi && Date.now() < cachedApi.expiresAt) {
-    return cachedApi.api;
+async function getSpotifyAccessToken(): Promise<string> {
+  if (cachedToken && Date.now() < cachedToken.expiresAt) {
+    return cachedToken.accessToken;
   }
 
   const clientId = process.env.SPOTIFY_CLIENT_ID;
@@ -195,22 +243,52 @@ async function getSpotifyApi(): Promise<SpotifyApi> {
   }
 
   console.log("Refreshing access token...");
-  const accessToken = await getAccessToken(
+  const token = await getAccessToken(
     clientId,
     clientSecret,
     refreshToken,
   );
   console.log("Access token obtained");
 
-  const api = SpotifyApi.withAccessToken(clientId, {
-    access_token: accessToken,
-    token_type: "Bearer",
-    expires_in: 3600,
-    refresh_token: refreshToken,
-  });
+  cachedToken = {
+    accessToken: token.accessToken,
+    expiresAt: Date.now() + Math.max(30, token.expiresIn - 60) * 1_000,
+  };
+  return token.accessToken;
+}
 
-  cachedApi = { api, expiresAt: Date.now() + 3_500_000 };
-  return api;
+async function spotifyGet<T>(pathname: string): Promise<T> {
+  const accessToken = await getSpotifyAccessToken();
+  const response = await fetch(`https://api.spotify.com/v1/${pathname}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!response.ok) {
+    lastSpotifyErrorAt = new Date().toISOString();
+    const body = (await response.json().catch(() => ({}))) as {
+      error?: { message?: string };
+    };
+    if (response.status === 401) cachedToken = null;
+    const retryAfterHeader = response.headers.get("retry-after");
+    const retryAfter = retryAfterHeader == null ? undefined : Number(retryAfterHeader);
+    throw new SpotifyUpstreamError(
+      body.error?.message || response.statusText || "Spotify request failed",
+      response.status,
+      retryAfter != null && Number.isFinite(retryAfter) ? retryAfter : undefined,
+    );
+  }
+  lastSpotifySuccessAt = new Date().toISOString();
+  return (await response.json()) as T;
+}
+
+export function getSpotifyHealth() {
+  const ready =
+    lastSpotifySuccessAt != null &&
+    (lastSpotifyErrorAt == null || lastSpotifySuccessAt > lastSpotifyErrorAt);
+  return {
+    ready,
+    lastSuccessAt: lastSpotifySuccessAt,
+    lastErrorAt: lastSpotifyErrorAt,
+  };
 }
 
 // --- Visibility filter ---
@@ -253,49 +331,49 @@ function isPlaylistVisible(name: string, isPublic: boolean | null): boolean {
  * current (`tracks.items[].track`) and post-March-2026 (`items.items[].item`)
  * API shapes.
  */
-function getTrackItems(
-  playlist: SpotifyPlaylist,
-): PlaylistedTrack<SpotifyTrack>[] {
-  const raw = playlist as any;
-
-  const container = raw.items ?? raw.tracks;
+export function getTrackItems(playlist: SpotifyPlaylist): SpotifyTrack[] {
+  const container = playlist.items ?? playlist.tracks;
   if (!container?.items) return [];
-
-  return container.items.map((entry: any) => {
-    const track = entry.item ?? entry.track;
-    return { ...entry, track };
-  });
+  return container.items
+    .map((entry) => ("item" in entry ? entry.item : "track" in entry ? entry.track : null))
+    .filter(
+      (track): track is SpotifyTrack =>
+        track != null && track.type === "track" && track.album != null,
+    );
 }
 
-const normalizeTracks = ({
+export const normalizeTracks = ({
   tracksFromApi,
   playlistDate,
   playlistUrl,
 }: {
-  tracksFromApi: PlaylistedTrack<SpotifyTrack>[];
+  tracksFromApi: SpotifyTrack[];
   playlistDate: string;
   playlistUrl: string;
 }): Track[] => {
-  return tracksFromApi.map(({ track }) => {
+  return tracksFromApi.flatMap((track) => {
     const { name, duration_ms, id, album, external_urls, artists } = track;
+    const trackUrl = external_urls?.spotify;
+    const albumUrl = album?.external_urls?.spotify;
+    if (!id || !album || !trackUrl || !albumUrl || !artists?.length) return [];
 
-    return {
-      url: external_urls.spotify,
-      image: album.images[1]?.url ?? album.images[0]?.url,
+    return [{
+      url: trackUrl,
+      image: album.images?.[1]?.url ?? album.images?.[0]?.url ?? "",
       artist: artists.map((a) => ({
         name: a.name,
-        url: a.external_urls.spotify,
+        url: a.external_urls?.spotify ?? "",
       })),
       date: playlistDate,
       length: {
         total_ms: duration_ms,
         readable_length: millisecondsToReadableTime(duration_ms),
       },
-      album: { name: album.name, url: album.external_urls.spotify },
+      album: { name: album.name, url: albumUrl },
       playlistUrl,
       id,
       title: name,
-    };
+    }];
   });
 };
 
@@ -321,13 +399,12 @@ export async function fetchListing(): Promise<Playlist[]> {
   console.log("Fetching playlist listing from Spotify...");
   listingInProgress = (async () => {
     try {
-      const api = await getSpotifyApi();
-      const allItems: any[] = [];
+      const allItems: SpotifyPlaylist[] = [];
       let offset = 0;
 
       while (true) {
         const page = await withRetry(
-          () => api.currentUser.playlists.playlists(50, offset),
+          () => spotifyGet<{ items: SpotifyPlaylist[]; total: number }>(`me/playlists?limit=50&offset=${offset}`),
           `listing offset=${offset}`,
         );
         if (!page.items?.length) break;
@@ -360,7 +437,7 @@ export async function fetchListing(): Promise<Playlist[]> {
       console.log(
         `Fetched ${playlists.length} playlists (${allItems.length} total from API)`,
       );
-      playlistCache.set(LISTING_CACHE_KEY, playlists);
+      playlistCache.set(LISTING_CACHE_KEY, playlists, LISTING_CACHE_TTL_SECONDS);
       return playlists;
     } finally {
       listingInProgress = null;
@@ -368,6 +445,10 @@ export async function fetchListing(): Promise<Playlist[]> {
   })();
 
   return listingInProgress;
+}
+
+export function invalidatePlaylistListing(): void {
+  playlistCache.del(LISTING_CACHE_KEY);
 }
 
 export async function fetchPlaylistTracks(
@@ -397,9 +478,8 @@ export async function fetchPlaylistTracks(
   console.log(`Fetching tracks for playlist ${playlistId}...`);
   const promise = (async () => {
     try {
-      const api = await getSpotifyApi();
       const playlist = await withRetry(
-        () => api.playlists.getPlaylist(playlistId),
+        () => spotifyGet<SpotifyPlaylist>(`playlists/${encodeURIComponent(playlistId)}`),
         `playlist ${playlistId}`,
       );
       const [month, year] = playlist.name.split(" ");
@@ -503,7 +583,8 @@ export async function fetchStats(): Promise<PlaylistStats> {
   for (const playlist of playlists) {
     const stableTracks = stablePlaylistsMap.get(playlist.id);
     const cachedTracks = playlistCache.get<Track[]>(tracksCacheKey(playlist.id));
-    const tracks = stableTracks ?? cachedTracks ?? [];
+    const tracks =
+      stableTracks ?? cachedTracks ?? (await fetchPlaylistTracks(playlist.id));
 
     totalTrackCount += tracks.length;
     totalDurationMs += tracks.reduce(
@@ -519,8 +600,25 @@ export async function fetchStats(): Promise<PlaylistStats> {
   };
 }
 
+/** All playlist tracks in one payload for the small, slowly growing search corpus. */
+export async function fetchAllTracks(): Promise<Track[]> {
+  const playlists = await fetchListing();
+  const allTracks: Track[] = [];
+
+  for (const playlist of playlists) {
+    const stableTracks = stablePlaylistsMap.get(playlist.id);
+    const cachedTracks = playlistCache.get<Track[]>(tracksCacheKey(playlist.id));
+    const tracks =
+      stableTracks ?? cachedTracks ?? (await fetchPlaylistTracks(playlist.id));
+    allTracks.push(...tracks);
+  }
+
+  return allTracks;
+}
+
 export default {
   fetchListing,
+  fetchAllTracks,
   fetchPlaylistTracks,
   fetchStats,
   hydrateTrackCache,

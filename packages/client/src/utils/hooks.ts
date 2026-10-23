@@ -32,7 +32,7 @@ export const useFetchPlaylists = () => {
       }
     };
     fetchPlaylistsData();
-  }, [setPlaylists, playlists]);
+  }, [setPlaylists, setIsLoading, playlists]);
 };
 
 export const usePlaylists = () => {
@@ -47,25 +47,13 @@ export const useTracks = () => {
 
 export const usePlaylist = (id?: string) => {
   const playlists = usePlaylists();
-
-  if (id) {
-    return useMemo(
-      () => playlists.find((playlist) => playlist.id === id),
-      [playlists, id],
-    );
-  }
-
-  let routeId: string | undefined;
-  try {
-    const params = useParams({ from: "/playlist/$id" });
-    routeId = params.id;
-  } catch {
-    routeId = undefined;
-  }
+  const params = useParams({ from: "/playlist/$id", shouldThrow: false });
+  const routeId = params?.id;
+  const selectedId = id ?? routeId;
 
   return useMemo(
-    () => playlists.find((playlist) => playlist.id === routeId),
-    [playlists, routeId],
+    () => playlists.find((playlist) => playlist.id === selectedId),
+    [playlists, selectedId],
   );
 };
 
@@ -102,7 +90,7 @@ export const usePlaylistTracks = (id?: string) => {
 };
 
 /** Parallel playlist track fetches; bounded to avoid hammering the API / browser connection limits. */
-const TRACK_FETCH_CONCURRENCY = 6;
+const TRACK_FETCH_CONCURRENCY = 2;
 
 export const useAllPlaylistTracks = () => {
   const playlists = useAtomValue(playlistsAtom);
@@ -140,7 +128,7 @@ export const useAllPlaylistTracks = () => {
         fetchingRef.current = false;
       }
     })();
-  }, [playlists, setTracks]);
+  }, [playlists, loadedIds, setTracks]);
 
   return { tracks, isLoading };
 };

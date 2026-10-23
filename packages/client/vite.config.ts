@@ -31,6 +31,10 @@ export default defineConfig(() => {
           target: apiProxyTarget,
           changeOrigin: true,
         },
+        "/tracks": {
+          target: apiProxyTarget,
+          changeOrigin: true,
+        },
         "/admin": {
           target: apiProxyTarget,
           changeOrigin: true,

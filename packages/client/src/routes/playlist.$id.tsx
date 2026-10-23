@@ -4,8 +4,7 @@ import { useParams } from "@tanstack/react-router";
 import { usePlaylists } from "../utils/hooks";
 import { useReplaceWithNewestPlaylist } from "../utils/redirect-newest";
 
-export const Route = createFileRoute("/playlist/$id")({
-  component: () => {
+function PlaylistRouteComponent() {
     const { id } = useParams({ from: "/playlist/$id" });
     const playlists = usePlaylists();
 
@@ -19,5 +18,8 @@ export const Route = createFileRoute("/playlist/$id")({
     }
 
     return <Playlist id={id} />;
-  },
+}
+
+export const Route = createFileRoute("/playlist/$id")({
+  component: PlaylistRouteComponent,
 });

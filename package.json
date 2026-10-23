@@ -14,9 +14,10 @@
     "build:server": "bun run --filter @spotify-playlists/server build",
     "build:client": "bun run --filter @spotify-playlists/client build",
     "start": "bun run packages/server/dist/index.js",
-    "lint": "bun run --recursive lint",
+    "lint": "bun run --filter @spotify-playlists/client lint",
     "clean": "bun run --filter @spotify-playlists/server clean && bun run --filter @spotify-playlists/client clean && rm -rf node_modules",
-    "type-check": "bun run --recursive type-check"
+    "type-check": "bun run --filter @spotify-playlists/shared type-check && bun run --filter @spotify-playlists/server type-check && bun run --filter @spotify-playlists/client type-check",
+    "test": "bun run --filter @spotify-playlists/server test && bun run --filter @spotify-playlists/client test"
   },
   "devDependencies": {
     "@types/node": "^24.6.0",
@@ -26,8 +27,5 @@
     "node": ">=18.0.0",
     "bun": ">=1.0.0"
   },
-  "packageManager": "bun@1.0.0",
-  "dependencies": {
-    "fuse.js": "^7.1.0"
-  }
+  "packageManager": "bun@1.3.14"
 }

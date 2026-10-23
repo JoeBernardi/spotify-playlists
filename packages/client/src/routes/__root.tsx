@@ -8,26 +8,24 @@ import Loader from "../components/Loader";
 import { useAtomValue } from "jotai";
 import { isLoadingAtom } from "../utils/store";
 
+function RootComponent() {
+  const isDevelopment = import.meta.env.DEV;
+  useFetchPlaylists();
+  const isLoading = useAtomValue(isLoadingAtom);
+
+  if (isLoading) return <Loader />;
+
+  return (
+    <div className="wrapper">
+      <Nav />
+      <div className="content"><Outlet /></div>
+      <MobileFooter />
+      {isDevelopment && <TanStackRouterDevtools />}
+    </div>
+  );
+}
+
 export const Route = createRootRoute({
   notFoundComponent: NotFoundRedirect,
-  component: () => {
-    const isDevelopment = import.meta.env.DEV;
-    useFetchPlaylists();
-    const isLoading = useAtomValue(isLoadingAtom);
-
-    if (isLoading) {
-      return <Loader />;
-    }
-
-    return (
-      <div className="wrapper">
-        <Nav />
-        <div className="content">
-          <Outlet />
-        </div>
-        <MobileFooter />
-        {isDevelopment && <TanStackRouterDevtools />}
-      </div>
-    );
-  },
+  component: RootComponent,
 });

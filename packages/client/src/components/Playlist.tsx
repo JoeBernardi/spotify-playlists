@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import DOMPurify from "dompurify";
 import { usePlaylistNav } from "../utils/playlist-nav";
 import LinkIcon from "../assets/img/icons/link.svg?react";
 import NextIcon from "../assets/img/icons/next.svg?react";
@@ -17,6 +18,10 @@ const Playlist = ({ id }: { id?: string }) => {
   } | null>(null);
   const playlist = usePlaylist(id);
   usePlaylistTracks(id);
+  const safeDescription = useMemo(
+    () => DOMPurify.sanitize(playlist?.description ?? ""),
+    [playlist?.description],
+  );
 
   useEffect(() => {
     setLightboxOpen(false);
@@ -119,6 +124,7 @@ const Playlist = ({ id }: { id?: string }) => {
               <a
                 href={playlist.url}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="playlist-info-text-header-link-icon"
               >
                 <LinkIcon />
@@ -132,10 +138,10 @@ const Playlist = ({ id }: { id?: string }) => {
               </button>
             </div>
           </div>
-          {playlist.description && (
+          {safeDescription && (
             <p
               className="playlist-info-text-description"
-              dangerouslySetInnerHTML={{ __html: playlist.description }}
+              dangerouslySetInnerHTML={{ __html: safeDescription }}
             />
           )}
         </div>

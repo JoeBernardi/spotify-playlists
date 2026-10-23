@@ -32,13 +32,6 @@ const PlaylistTracks = ({ tracks, showDates = false }: PlaylistTracksProps) => {
       </thead>
       <tbody>
         {tracks.map((track) => {
-          const artists = track.artist
-            .map(
-              (artist) =>
-                `<a target="_blank" href="${artist.url}">${artist.name}</a>`,
-            )
-            .join(", ");
-
           return (
             <tr
               className="playlist-tracks-track"
@@ -46,16 +39,22 @@ const PlaylistTracks = ({ tracks, showDates = false }: PlaylistTracksProps) => {
               style={{ height: "44px" }}
             >
               <td className="playlist-tracks-track-info title">
-                <a target="_blank" href={track.url}>
+                <a target="_blank" rel="noopener noreferrer" href={track.url}>
                   {track.title}
                 </a>
               </td>
-              <td
-                className="playlist-tracks-track-info artist"
-                dangerouslySetInnerHTML={{ __html: artists }}
-              />
+              <td className="playlist-tracks-track-info artist">
+                {track.artist.map((artist, index) => (
+                  <span key={`${artist.url}-${artist.name}`}>
+                    {index > 0 && ", "}
+                    <a target="_blank" rel="noopener noreferrer" href={artist.url}>
+                      {artist.name}
+                    </a>
+                  </span>
+                ))}
+              </td>
               <td className="playlist-tracks-track-info album">
-                <a target="_blank" href={track.album.url}>
+                <a target="_blank" rel="noopener noreferrer" href={track.album.url}>
                   {track.album.name}
                 </a>
               </td>
@@ -64,7 +63,7 @@ const PlaylistTracks = ({ tracks, showDates = false }: PlaylistTracksProps) => {
               </td>
               {showDates && (
                 <td className="playlist-tracks-track-info date">
-                  <a target="_blank" href={track.playlistUrl}>
+                  <a target="_blank" rel="noopener noreferrer" href={track.playlistUrl}>
                     {track.date}
                   </a>
                 </td>

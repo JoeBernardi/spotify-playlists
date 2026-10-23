@@ -1,40 +1,34 @@
-import Fuse, { type IFuseOptions } from "fuse.js";
+import { useEffect, useMemo, useState } from "react";
+import { fetchAllTracks } from "./api";
 import type { Track } from "@spotify-playlists/shared";
-import { useDeferredValue, useMemo, useState } from "react";
-import { useAllPlaylistTracks } from "./hooks";
-
-const FUSE_OPTIONS: IFuseOptions<Track> = {
-  includeScore: true,
-  threshold: 0.1,
-  ignoreLocation: true,
-  ignoreDiacritics: true,
-  fieldNormWeight: 1.5,
-  ignoreFieldNorm: true,
-  keys: [
-    { name: "title", weight: 0.2 },
-    { name: "artist.name", weight: 0.5 },
-    { name: "album.name", weight: 0.2 },
-  ],
-};
+import { filterTracks } from "./search-filter";
 
 export const useSearch = () => {
-  const { tracks, isLoading } = useAllPlaylistTracks();
-  const deferredTracks = useDeferredValue(tracks);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [query, setQuery] = useState("");
 
-  const fuse = useMemo(
-    () => new Fuse(deferredTracks, FUSE_OPTIONS),
-    [deferredTracks],
-  );
+  useEffect(() => {
+    let cancelled = false;
+    fetchAllTracks()
+      .then((data) => {
+        if (!cancelled) setTracks(data);
+      })
+      .catch((err) => {
+        console.error("Failed to load track search data:", err);
+        if (!cancelled) setError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
 
-  const filteredTracks = useMemo(() => {
-    const normalizedQuery = query.trim();
-    if (!normalizedQuery) {
-      return [];
-    }
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-    return fuse.search(normalizedQuery).map((result) => result.item);
-  }, [query, fuse]);
+  const filteredTracks = useMemo(() => filterTracks(tracks, query), [tracks, query]);
 
-  return { filteredTracks, isLoading, query, setQuery };
+  return { filteredTracks, isLoading, error, query, setQuery };
 };

@@ -6,6 +6,7 @@ import {
   fetchListing,
   hydrateTrackCache,
   loadStablePlaylistsFromDisk,
+  getSpotifyHealth,
 } from "./helpers.js";
 
 const fastify = Fastify({ logger: true });
@@ -14,10 +15,7 @@ async function main() {
   const port = parseInt(process.env.PORT || "3000", 10);
   const nodeEnv = process.env.NODE_ENV || "development";
 
-  const corsOrigins =
-    nodeEnv === "development"
-      ? ["http://localhost:5173"]
-      : true;
+  const corsOrigins = nodeEnv === "development" ? ["http://localhost:5173"] : false;
 
   await fastify.register(import("@fastify/cors"), {
     origin: corsOrigins,
@@ -30,16 +28,10 @@ async function main() {
   await registerApiRoutes(fastify);
   await registerAdminRoutes(fastify);
 
-  fastify.get("/__static-check", async (_req, reply) => {
-    try {
-      const cwd = process.cwd();
-      const nodeEnv = process.env.NODE_ENV || "development";
-      return reply.send({ ok: true, cwd, nodeEnv });
-    } catch (e) {
-      return reply
-        .status(500)
-        .send({ ok: false, error: e instanceof Error ? e.message : String(e) });
-    }
+  fastify.get("/health/live", async (_req, reply) => reply.send({ ok: true }));
+  fastify.get("/health/ready", async (_req, reply) => {
+    const spotify = getSpotifyHealth();
+    return reply.status(spotify.ready ? 200 : 503).send({ ok: spotify.ready, spotify });
   });
 
   console.log("Loading stable playlists from disk...");

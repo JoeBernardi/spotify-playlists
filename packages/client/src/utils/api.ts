@@ -83,3 +83,14 @@ export const fetchPlaylistTracks = async (id: string): Promise<Track[]> => {
     inflightTrackRequests.delete(id);
   }
 };
+
+export const fetchAllTracks = async (): Promise<Track[]> => {
+  const response = await fetch(`${API_BASE_URL}/tracks`);
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch all tracks: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  return (await response.json()) as Track[];
+};

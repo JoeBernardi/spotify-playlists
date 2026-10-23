@@ -4,15 +4,18 @@
   "type": "module",
   "scripts": {
     "dev": "bunx vite",
-    "build": "bunx vite build",
+    "build": "bun --bun vite build",
     "preview": "bunx vite preview",
     "clean": "rm -rf dist",
-    "type-check": "bunx tsc --noEmit"
+    "type-check": "bunx tsc --noEmit",
+    "lint": "bun --bun eslint src",
+    "test": "bun test"
   },
   "dependencies": {
     "@spotify-playlists/shared": "workspace:*",
     "@tanstack/react-router": "^1.133.8",
     "@tanstack/router-devtools": "^1.133.8",
+    "dompurify": "^3.4.14",
     "jotai": "^2.15.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"

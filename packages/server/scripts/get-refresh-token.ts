@@ -13,9 +13,12 @@
 
 import dotenv from "dotenv";
 import { resolve } from "node:path";
+import { readFile, writeFile } from "node:fs/promises";
 import { createInterface } from "node:readline";
 
 dotenv.config({ path: resolve(import.meta.dirname, "../.env") });
+const envPath = resolve(import.meta.dirname, "../.env");
+const writeEnv = process.argv.includes("--write-env");
 
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_SECRET;
@@ -91,6 +94,18 @@ rl.question("> ", async (input) => {
     process.exit(1);
   }
 
-  console.log("\nAdd this to your .env and Fly secrets:\n");
-  console.log(`SPOTIFY_REFRESH_TOKEN=${tokenData.refresh_token}\n`);
+  if (writeEnv) {
+    const currentEnv = await readFile(envPath, "utf-8").catch(() => "");
+    const nextEnv = /^SPOTIFY_REFRESH_TOKEN=.*$/m.test(currentEnv)
+      ? currentEnv.replace(
+          /^SPOTIFY_REFRESH_TOKEN=.*$/m,
+          `SPOTIFY_REFRESH_TOKEN=${tokenData.refresh_token}`,
+        )
+      : `${currentEnv.trimEnd()}\nSPOTIFY_REFRESH_TOKEN=${tokenData.refresh_token}\n`;
+    await writeFile(envPath, nextEnv, { mode: 0o600 });
+    console.log("\nUpdated packages/server/.env with the new refresh token.\n");
+  } else {
+    console.log("\nAdd this to your .env and Fly secrets:\n");
+    console.log(`SPOTIFY_REFRESH_TOKEN=${tokenData.refresh_token}\n`);
+  }
 });
