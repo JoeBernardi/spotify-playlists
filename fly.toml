@@ -4,7 +4,7 @@
 #
 
 app = "likes-song"
-primary_region = "ord"
+primary_region = "ewr"
 
 [build]
 
