@@ -20,7 +20,7 @@
     "test": "bun run --filter @spotify-playlists/server test && bun run --filter @spotify-playlists/client test"
   },
   "devDependencies": {
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "typescript": "~5.9.3"
   },
   "engines": {
